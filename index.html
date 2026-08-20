@@ -366,7 +366,15 @@
             border-radius: 5px;
         }
         .stats-table th { color: var(--accent-neon-blue); padding: 12px; border-bottom: 2px solid var(--accent-neon-blue); text-align: left; }
-        .stats-table td { padding: 10px; border-bottom: 1px solid #222; }
+        .stats-table td { padding: 10px; border-bottom: 1px solid #222; color: #cbd5e1; }
+        .stats-table tbody tr:nth-child(even) { background: rgba(255,255,255,0.03); }
+        .stats-table tbody tr:nth-child(odd) { background: rgba(255,255,255,0.07); }
+        .stats-table tbody tr:hover { background: var(--section-accent-bg); }
+        .stats-table td.name { color: var(--accent-neon-blue); font-weight: 700; }
+        .stats-table td.amount, .stats-table td.deposit { color: var(--accent-neon-blue); font-weight: 700; }
+        .stats-table td.no-info { color: #94a3b8; font-style: italic; }
+        tr.hist-reroll { background: rgba(245, 158, 11, 0.10) !important; }
+        tr.hist-reroll td { color: #f59e0b; font-weight: 700; }
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-thumb { background: var(--accent-neon-blue); border-radius: 10px; box-shadow: 0 0 0 transparent; }
         .win-response-msg {
@@ -1042,7 +1050,7 @@
 </head>
 <body>
     <div class="theme-switcher">
-        <label for="theme-select" style="margin-left: -10px;">ЦВЕТ</label>
+        <label for="theme-select" style="margin-left: 0px;">ЦВЕТ</label>
         <select id="theme-select" onchange="applyTheme(this.value)" style="margin-left: 0px;">
             <option value="pink">Розовый</option>
             <option value="blue">Синий</option>
@@ -1959,7 +1967,12 @@
         function rollForNonWinners() {
             // Get all participants who have never won
             const allNames = Array.from(participants);
-            const winners = new Set(globalHistory.map(entry => entry.name.toLowerCase()));
+            // Winners only — exclude rerolls (isReroll): those who were rerolled never actually won
+            const winners = new Set(
+                globalHistory
+                    .filter(entry => !entry.isReroll)
+                    .map(entry => entry.name.toLowerCase())
+            );
             const nonWinners = allNames.filter(name => !winners.has(name.toLowerCase()));
             
             if (nonWinners.length === 0) {
@@ -1978,8 +1991,12 @@
             const arr = Array.from(participants).reverse();
             let html = '';
             
-            // Get all winners from history
-            const winners = new Set(globalHistory.map(entry => entry.name.toLowerCase()));
+            // Get all actual winners from history (exclude rerolls — they never won)
+            const winners = new Set(
+                globalHistory
+                    .filter(entry => !entry.isReroll)
+                    .map(entry => entry.name.toLowerCase())
+            );
             
             arr.forEach((u, i) => {
                 // Check if this user has won before
@@ -2196,13 +2213,34 @@
             [...globalHistory].reverse().forEach((h, index) => {
                 const realIndex = globalHistory.length - 1 - index;
                 if (h.isReroll) {
-                    body.innerHTML += `<tr style="background:rgba(245,158,11,0.08);"><td><small>${h.date}</small></td><td style="color:#f59e0b; font-weight:bold;">🔄 ${h.name}</td><td style="color:#aaa;">${h.tg || '---'}</td><td style="color:#f59e0b; font-weight:bold;">БЫЛ РЕРОЛЬНУТ</td><td>—</td><td>—</td><td style="text-align:center;">${h.rerolls || 0}</td><td style="text-align:center;"><button style="background:none; border:none; color:red; cursor:pointer;" onclick="deleteHistoryItem(${realIndex})" title="Удалить">🗑️</button></td></tr>`;
+                    body.innerHTML += `<tr class="hist-reroll">
+                        <td><small>${h.date}</small></td>
+                        <td class="name">🔄 ${h.name}</td>
+                        <td>${h.tg || '---'}</td>
+                        <td>БЫЛ РЕРОЛЬНУТ</td>
+                        <td>—</td><td>—</td>
+                        <td style="text-align:center;">${h.rerolls || 0}</td>
+                        <td style="text-align:center;"><button style="background:none;border:none;color:red;cursor:pointer;" onclick="deleteHistoryItem(${realIndex})" title="Удалить">🗑️</button></td>
+                    </tr>`;
                 } else {
                     const tgDisplay = (h.tg === 'НЕТ ИНФОРМАЦИИ' || h.tg === '---' || !h.tg) ? 'НЕТ ИНФОРМАЦИИ' : h.tg;
                     const siteDisplay = (h.site === 'НЕТ ИНФОРМАЦИИ' || h.site === '---' || !h.site) ? 'НЕТ ИНФОРМАЦИИ' : h.site;
                     const amountDisplay = (typeof h.amount === 'number' && !Number.isNaN(h.amount)) ? h.amount.toLocaleString() + ' ₽' : 'НЕТ ИНФОРМАЦИИ';
                     const depositDisplay = (typeof h.deposit === 'number' && !Number.isNaN(h.deposit)) ? h.deposit.toLocaleString() + ' ₽' : 'НЕТ ИНФОРМАЦИИ';
-                    body.innerHTML += `<tr><td><small>${h.date}</small></td><td style="color:var(--accent-neon-blue); font-weight:bold;">${h.name}</td><td style="color:${tgDisplay === 'НЕТ ИНФОРМАЦИИ' ? '#f59e0b' : '#aaa'}; font-weight:${tgDisplay === 'НЕТ ИНФОРМАЦИИ' ? 'bold' : 'normal'};">${tgDisplay}</td><td style="color:${siteDisplay === 'НЕТ ИНФОРМАЦИИ' ? '#f59e0b' : '#fff'}; font-weight:${siteDisplay === 'НЕТ ИНФОРМАЦИИ' ? 'bold' : 'normal'};">${siteDisplay}</td><td style="color:var(--accent-neon-blue); font-weight:bold;">${amountDisplay}</td><td style="color:${depositDisplay === 'НЕТ ИНФОРМАЦИИ' ? '#f59e0b' : 'white'}; font-weight:bold;">${depositDisplay}</td><td style="text-align:center;">${h.rerolls || 0}</td><td style="text-align:center;"><button style="background:none; border:none; color:var(--accent-neon-blue); cursor:pointer;" onclick="editHistoryItem(${realIndex})" title="Редактировать">✏️</button><button style="background:none; border:none; color:red; cursor:pointer;" onclick="deleteHistoryItem(${realIndex})" title="Удалить">🗑️</button></td></tr>`;
+                    const tgClass   = tgDisplay === 'НЕТ ИНФОРМАЦИИ' ? 'no-info' : '';
+                    const siteClass = siteDisplay === 'НЕТ ИНФОРМАЦИИ' ? 'no-info' : '';
+                    const amountClass = amountDisplay === 'НЕТ ИНФОРМАЦИИ' ? 'no-info' : 'amount';
+                    const depClass    = depositDisplay === 'НЕТ ИНФОРМАЦИИ' ? 'no-info' : 'deposit';
+                    body.innerHTML += `<tr>
+                        <td><small>${h.date}</small></td>
+                        <td class="name">${h.name}</td>
+                        <td class="${tgClass}">${tgDisplay}</td>
+                        <td class="${siteClass}">${siteDisplay}</td>
+                        <td class="${amountClass}">${amountDisplay}</td>
+                        <td class="${depClass}">${depositDisplay}</td>
+                        <td style="text-align:center;">${h.rerolls || 0}</td>
+                        <td style="text-align:center;"><button style="background:none;border:none;color:var(--accent-neon-blue);cursor:pointer;" onclick="editHistoryItem(${realIndex})" title="Редактировать">✏️</button><button style="background:none;border:none;color:red;cursor:pointer;" onclick="deleteHistoryItem(${realIndex})" title="Удалить">🗑️</button></td>
+                    </tr>`;
                 }
             });
             document.getElementById('history-modal').style.display = 'flex';
