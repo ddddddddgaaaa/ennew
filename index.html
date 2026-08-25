@@ -1185,6 +1185,26 @@
             0%, 100% { transform: scale(1); box-shadow: 0 0 70px rgba(239, 68, 68, 0.55), inset 0 0 40px rgba(239, 68, 68, 0.12); }
             50% { transform: scale(1.04); box-shadow: 0 0 100px rgba(239, 68, 68, 0.8), inset 0 0 55px rgba(239, 68, 68, 0.2); }
         }
+
+        /* Triangle participants in grid + "ДАЛЬШЕ" random draw bar */
+        .grid-tri { display:flex; align-items:center; gap:8px; padding:5px 8px; background:rgba(255,255,255,0.03); border:1px solid transparent; border-radius:8px; transition:all 0.2s ease; min-width:0; }
+        .grid-tri:hover { background:var(--accent-hover-bg); border-color:var(--accent-neon-blue); }
+        .tri-shape { width:0; height:0; border-left:7px solid transparent; border-right:7px solid transparent; border-bottom:12px solid var(--accent-neon-blue); filter:drop-shadow(0 0 4px color-mix(in srgb, var(--accent-neon-blue) 60%, transparent)); flex-shrink:0; }
+        .grid-tri.champion .tri-shape { border-bottom-color:#22c55e; filter:drop-shadow(0 0 6px #22c55e); }
+        .grid-tri.won-tri .tri-shape { border-bottom-color:var(--twitch-vip); }
+        .grid-tri .tri-name { font-size:12px; color:#e2e8f0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        .grid-tri .tri-tag { font-size:8px; padding:1px 4px; border-radius:4px; background:rgba(148,163,184,0.15); border:1px solid rgba(148,163,184,0.35); color:#94a3b8; font-weight:800; flex-shrink:0; }
+        .grid-tri.out .tri-shape { border-bottom-color:#3a3a3a; filter:none; }
+        .grid-tri.out .tri-name { opacity:0.35; text-decoration:line-through; }
+        .grid-tri.out .tri-tag { opacity:0.35; }
+        #grid-draw-bar { border-top:1px solid var(--panel-border); padding:12px 14px; display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap; background:rgba(2,8,20,0.6); }
+        #grid-draw-info { display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+        .draw-round-badge { display:inline-flex; align-items:center; padding:6px 14px; border-radius:999px; background:var(--participant-badge-bg); border:1px solid var(--participant-badge-border); color:var(--participant-badge-text); font-size:12px; font-weight:800; letter-spacing:0.06em; text-transform:uppercase; }
+        .draw-all-badge { display:inline-flex; align-items:center; padding:6px 14px; border-radius:999px; background:rgba(34,197,94,0.12); border:1px solid rgba(74,222,128,0.4); color:#86efac; font-size:12px; font-weight:800; }
+        #grid-draw-next { padding:12px 34px; font-size:15px; margin:0; font-weight:900; letter-spacing:1px; background:linear-gradient(135deg,#15803d,#22c55e); border:2px solid #4ade80; color:#fff; text-shadow:none; box-shadow:none; }
+        #grid-draw-next:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(34,197,94,0.4); }
+        #grid-draw-next:disabled { filter:grayscale(0.6) brightness(0.7); cursor:not-allowed; transform:none; box-shadow:none; }
+        .draw-champ { text-align:center; padding:8px 16px; border-radius:12px; background:rgba(34,197,94,0.14); border:2px solid #22c55e; color:#86efac; font-weight:900; font-size:14px; letter-spacing:1px; text-transform:uppercase; box-shadow:0 0 24px rgba(34,197,94,0.35); animation:champPulse 2s infinite ease-in-out; }
         @media (max-width: 980px) {
             .import-layout {
                 grid-template-columns: 1fr;
@@ -1595,6 +1615,14 @@
                 <button id="grid-sel-btn" class="btn-main btn-start-green pulse" style="margin: 0; padding: 10px 28px; font-size: 14px; font-weight: 800; letter-spacing: 1px;" onclick="startGridElimination()">НАЧАТЬ</button>
             </div>
             <div id="grid-participants-container" style="flex: 1; overflow-y: auto; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; align-content: start; padding-right: 8px; padding-bottom: 8px;">
+            </div>
+            <div id="grid-draw-bar" style="display:none;">
+                <div id="grid-draw-info">
+                    <span class="draw-round-badge" id="grid-draw-round">РАУНД</span>
+                    <span class="draw-all-badge" id="grid-draw-count">0 из 0</span>
+                    <div id="grid-draw-champion" class="draw-champ" style="display:none;"></div>
+                </div>
+                <button id="grid-draw-next" class="btn-main" onclick="gridDrawNext()">ДАЛЬШЕ ▶</button>
             </div>
         </div>
     </div>
@@ -2940,21 +2968,78 @@ showEliminationBanner(null);
             renderParticipantsGrid();
             const bar = document.getElementById('bracket-sel-bar');
             const controls = document.getElementById('grid-controls');
-            if (bar) bar.style.display = (gridMode === 'select') ? 'flex' : 'none';
+            if (bar) bar.style.display = 'none'; // select использует нижнюю панель ДАЛЬШЕ
             if (controls) controls.style.display = (gridMode === 'select') ? 'none' : 'flex';
             const search = document.getElementById('grid-search-input');
             if (search) search.value = '';
             document.getElementById('participants-grid-modal').style.display = 'flex';
-            if (gridMode === 'select' && bracketSel) {
-                const btn = document.getElementById('grid-sel-btn');
-                if (btn) {
-                    btn.innerText = 'НАЧАТЬ';
-                    btn.disabled = false;
-                    btn.classList.add('pulse');
-                    btn.dataset.mode = 'start';
-                }
-                updateGridSelUI();
+            if (gridMode === 'select') {
+                initGridDraw();
+            } else {
+                const db = document.getElementById('grid-draw-bar');
+                if (db) db.style.display = 'none';
             }
+        }
+
+
+        let gridDraw = null; // { pool, active, eliminated:Set, champion }
+
+        function roundLabelFor(n) {
+            if (n <= 1) return 'ЧЕМПИОН';
+            if (n <= 2) return 'ФИНАЛ';
+            if (n <= 4) return '1/2';
+            if (n <= 8) return '1/4';
+            if (n <= 16) return '1/8';
+            if (n <= 32) return '1/16';
+            if (n <= 64) return '1/32';
+            if (n <= 128) return '1/64';
+            return 'РАУНД (' + n + ')';
+        }
+
+        function initGridDraw() {
+            const pool = (bracketSel && bracketSel.pool) ? bracketSel.pool.slice() : Array.from(participants);
+            gridDraw = { pool: pool.slice(), active: pool.slice(), eliminated: new Set(), champion: null };
+            renderParticipantsGrid();
+            renderGridDrawBar();
+        }
+
+        function renderGridDrawBar() {
+            if (!gridDraw) return;
+            const bar = document.getElementById('grid-draw-bar');
+            if (bar) bar.style.display = (gridMode === 'select') ? 'flex' : 'none';
+            const roundEl = document.getElementById('grid-draw-round');
+            const countEl = document.getElementById('grid-draw-count');
+            const champEl = document.getElementById('grid-draw-champion');
+            const nextBtn = document.getElementById('grid-draw-next');
+            if (roundEl) roundEl.innerText = roundLabelFor(gridDraw.active.length);
+            if (countEl) countEl.innerText = gridDraw.active.length + ' из ' + gridDraw.pool.length;
+            if (champEl) {
+                if (gridDraw.active.length === 1 && gridDraw.champion) {
+                    champEl.style.display = 'block';
+                    champEl.innerText = '👑 ЧЕМПИОН: ' + gridDraw.champion;
+                } else {
+                    champEl.style.display = 'none';
+                    champEl.innerText = '';
+                }
+            }
+            if (nextBtn) {
+                const done = gridDraw.active.length <= 1;
+                nextBtn.disabled = done;
+                nextBtn.innerText = done ? 'ЗАНОВО 🔄' : 'ДАЛЬШЕ ▶';
+            }
+        }
+
+        function gridDrawNext() {
+            if (!gridDraw) return;
+            if (gridDraw.active.length <= 1) { initGridDraw(); return; }
+            const survivorsCount = Math.ceil(gridDraw.active.length / 2);
+            const shuffled = gridDraw.active.slice().sort(() => Math.random() - 0.5);
+            const survivors = shuffled.slice(0, survivorsCount);
+            for (let i = survivorsCount; i < shuffled.length; i++) gridDraw.eliminated.add(shuffled[i]);
+            gridDraw.active = survivors;
+            if (gridDraw.active.length === 1) gridDraw.champion = gridDraw.active[0];
+            renderParticipantsGrid();
+            renderGridDrawBar();
         }
 
         function renderParticipantsGrid() {
@@ -2984,27 +3069,23 @@ showEliminationBanner(null);
             }
 
             let html = '';
-            const isSelect = (gridMode === 'select' && bracketSel);
+            const isSelect = (gridMode === 'select' && (bracketSel || gridDraw));
             filtered.forEach((u) => {
                 const hasWon = winners.has(u.toLowerCase());
-                const statusClass = hasWon ? 'won-status' : 'not-won-status';
-                const statusText = hasWon ? 'ВЫИГРЫВАЛ' : 'НЕ ВЫИГРЫВАЛ';
-                const origIndex = arr.indexOf(u) + 1;
                 const isPhantom = /^Фантом/i.test(u);
-                const isOut = isSelect && bracketSel.out.has(u);
                 const pid = encodeURIComponent(u);
-
-                html += `<div class="participant-grid-card ${hasWon ? 'is-winner' : ''}${isOut ? ' outcard' : ''}" data-pid="${pid}">
-                    ${isSelect ? '<span class="strike-bar"></span>' : ''}
-                    <span class="participant-grid-num">#${origIndex}</span>
-                    <span class="participant-grid-name" title="${u}"><b>${u}</b> ${isPhantom ? '<span class="phantom-tag">ФАНТОМ</span>' : ''}</span>
-                    <span class="participant-badge ${statusClass}" style="font-size: 9px; padding: 2px 7px;">${statusText}</span>
-                    <label style="margin-left: auto; cursor: pointer; display: flex; align-items: center;">
-                        <input type="checkbox" checked ${isSelect ? 'disabled' : ''} onchange="toggleParticipantActive('${u.replace(/'/g, "\\'")}', this.checked)" title="Активировать / деактивировать">
-                    </label>
-                </div>`;
+                let out = false;
+                if (gridMode === 'select' && gridDraw && gridDraw.eliminated) {
+                    out = gridDraw.eliminated.has(u);
+                } else if (isSelect && bracketSel && bracketSel.out.has(u)) {
+                    out = true;
+                }
+                const isChamp = gridDraw && gridDraw.champion === u;
+                html += '<div class="grid-tri' + (out ? ' out' : '') + (hasWon ? ' won-tri' : '') + (isChamp ? ' champion' : '') + '" data-pid="' + pid + '" title="' + u + '">';
+                html += '<span class="tri-shape"></span><span class="tri-name"><b>' + u + '</b></span>' + (isPhantom ? '<span class="tri-tag">ФАНТОМ</span>' : '');
+                html += '</div>';
             });
-            container.innerHTML = html;
+                        container.innerHTML = html;
         }
         function toggleParticipantActive(name, active) {
             if (active) {
