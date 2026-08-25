@@ -581,55 +581,22 @@
             letter-spacing: 0.06em;
         }
         
-        /* Bracket pre-selection: square grid + strikethrough elimination */
-        .preselect-grid {
-            display: grid;
-            gap: 10px;
-            width: 100%;
-            max-height: 52vh;
-            overflow-y: auto;
-            padding: 6px;
-            box-sizing: border-box;
-        }
-        .preselect-cell {
+        /* Bracket selection inside the full participants grid (strikethrough elimination) */
+        .participant-grid-card {
             position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--accent-soft-border);
-            border-radius: 10px;
-            padding: 14px 8px;
-            text-align: center;
-            font-weight: 700;
-            font-size: 12px;
-            color: var(--soft-light);
-            overflow: hidden;
-            white-space: nowrap;
-            min-width: 0;
-            transition: background 0.4s, border-color 0.4s, color 0.4s, transform 0.3s;
         }
-        .preselect-cell .preselect-idx {
-            display: inline-block;
-            color: var(--accent-neon-blue);
-            font-weight: 800;
-            margin-right: 6px;
-            font-size: 11px;
+        .participant-grid-card.outcard {
             opacity: 0.8;
+            background: rgba(239, 68, 68, 0.1);
+            border-color: rgba(239, 68, 68, 0.45);
         }
-        .preselect-cell .preselect-name {
-            overflow: hidden;
-            text-overflow: ellipsis;
-            min-width: 0;
+        .participant-grid-card.outcard .participant-grid-name,
+        .participant-grid-card.outcard .participant-grid-num,
+        .participant-grid-card.outcard .participant-badge,
+        .participant-grid-card.outcard label {
+            opacity: 0.4;
         }
-        .preselect-cell.out {
-            color: #6b7280;
-            background: rgba(239, 68, 68, 0.08);
-            border-color: rgba(239, 68, 68, 0.4);
-            opacity: 0.85;
-            transform: scale(0.98);
-        }
-        .preselect-cell .strike {
+        .participant-grid-card .strike-bar {
             position: absolute;
             left: 0;
             top: 50%;
@@ -640,16 +607,15 @@
             border-radius: 2px;
             box-shadow: 0 0 10px rgba(239, 68, 68, 0.85);
             z-index: 2;
+            pointer-events: none;
         }
-        .preselect-cell.out .strike {
-            animation: preselect-strike 0.55s ease-out forwards;
+        .participant-grid-card.outcard .strike-bar {
+            width: 100%;
+            animation: grid-strike 0.6s ease-out forwards;
         }
-        @keyframes preselect-strike {
+        @keyframes grid-strike {
             from { width: 0%; }
             to { width: 100%; }
-        }
-        .preselect-cell.out .preselect-name {
-            opacity: 0.4;
         }
         .btn-start-green {
             background: linear-gradient(135deg, #15803d, #22c55e);
@@ -666,12 +632,12 @@
             transform: none;
             box-shadow: none;
         }
-        @keyframes preselect-pulse {
+        @keyframes block-pulse {
             0%, 100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.5); }
             50% { box-shadow: 0 0 0 8px rgba(34, 197, 94, 0); }
         }
         .btn-start-green.pulse {
-            animation: preselect-pulse 1.2s ease-out infinite;
+            animation: block-pulse 1.2s ease-out infinite;
         }
 
         .playoff-rounds-container {
@@ -1494,29 +1460,6 @@
         </div>
     </div>
 
-    <!-- Modal: Bracket Pre-Selection (strikethrough elimination) -->
-    <div id="bracket-preselect-modal" class="modal">
-        <div class="modal-content" style="flex-direction: column; width: 92vw; max-width: 1000px; height: 88vh; max-height: 880px; padding: 25px; box-sizing: border-box;">
-            <div class="close-x" onclick="closeModals()">&times;</div>
-            <h2 style="color: var(--accent-neon-blue); margin: 0 0 4px 0; text-shadow: none; font-size: 22px; text-align: center; letter-spacing: 1px;">СБОР СОСТАВА СЕТКИ</h2>
-            <p style="color: #94a3b8; font-size: 13px; text-align: center; margin: 0 0 4px 0;">
-                Нужно отобрать <b id="preselect-needed" style="color: var(--accent-neon-blue);">0</b> участников.
-                Нажмите «НАЧАТЬ» — лишние будут зачёркнуты автоматически.
-            </p>
-            <div style="text-align: center; margin: 0 0 12px 0;">
-                <span class="participant-badge" id="preselect-count-badge" style="font-size: 12px; padding: 4px 12px; border-radius: 8px;">0 / 0</span>
-            </div>
-
-            <div id="bracket-preselect-grid" class="preselect-grid">
-                <!-- participants rendered dynamically -->
-            </div>
-
-            <div style="display: flex; gap: 10px; justify-content: center; align-items: center; margin-top: 16px; flex-wrap: wrap;">
-                <button id="preselect-start-btn" class="btn-main btn-start-green pulse" style="margin: 0; padding: 12px 34px; font-size: 15px; font-weight: 800; letter-spacing: 1px;" onclick="startPreselectElimination()">НАЧАТЬ</button>
-            </div>
-        </div>
-    </div>
-
     <!-- Modal: Playoff Tournament Bracket -->
     <div id="playoff-bracket-modal" class="modal">
         <div class="modal-content" style="flex-direction: column; width: 96vw; max-width: 1440px; height: 90vh; padding: 25px; box-sizing: border-box;">
@@ -1552,11 +1495,18 @@
                     <h2 style="color: var(--accent-neon-blue); margin: 0; text-shadow: none; font-size: 22px; letter-spacing: 1px;">СПИСОК УЧАСТНИКОВ</h2>
                     <span id="grid-user-count-badge" class="participant-badge" style="font-size: 13px; padding: 4px 12px; border-radius: 8px;">0</span>
                 </div>
-                <div style="display: flex; align-items: center; gap: 10px;">
+                <div id="grid-controls" style="display: flex; align-items: center; gap: 10px;">
                     <input type="text" id="grid-search-input" placeholder="🔍 Поиск участника..." oninput="renderParticipantsGrid()" style="padding: 8px 14px; font-size: 13px; width: 220px; border-radius: 8px;">
                     <button class="btn-main btn-purple" style="margin: 0; padding: 8px 14px; width: auto; font-size: 11px; white-space: nowrap;" onclick="addPhantomParticipant()">➕ Фантом</button>
                     <button class="btn-main" style="margin: 0; padding: 8px 16px; width: auto; font-size: 11px; white-space: nowrap;" onclick="copyParticipants()">📋 Скопировать</button>
                 </div>
+            </div>
+            <div id="bracket-sel-bar" style="display: none; align-items: center; justify-content: space-between; gap: 14px; background: rgba(34, 197, 94, 0.08); border: 1px solid rgba(74, 222, 128, 0.4); border-radius: 12px; padding: 10px 16px; margin-bottom: 12px; flex-wrap: wrap;">
+                <div style="color: #e2e8f0; font-size: 13px;">
+                    Отобрать <b id="grid-sel-needed" style="color: var(--accent-neon-blue); font-size: 16px;">0</b> из <b id="grid-sel-total" style="color: var(--accent-neon-blue); font-size: 16px;">0</b>
+                    <span class="participant-badge" id="grid-sel-badge" style="margin-left: 12px; font-size: 12px; padding: 3px 10px; border-radius: 8px;">0 / 0</span>
+                </div>
+                <button id="grid-sel-btn" class="btn-main btn-start-green pulse" style="margin: 0; padding: 10px 28px; font-size: 14px; font-weight: 800; letter-spacing: 1px;" onclick="startGridElimination()">НАЧАТЬ</button>
             </div>
             <div id="grid-participants-container" style="flex: 1; overflow-y: auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 10px; align-content: start; padding-right: 6px;">
             </div>
@@ -2494,7 +2444,7 @@
                 return;
             }
 
-            openBracketPreselect(requiredCount, stageName);
+            openBracketSelection(requiredCount, stageName);
         }
 
         async function fillMissingPhantoms(targetCount, stageName) {
@@ -2506,112 +2456,62 @@
             setTimeout(() => {
                 updateBracketSelectUi();
                 if (participants.size >= targetCount) {
-                    openBracketPreselect(targetCount, stageName);
+                    openBracketSelection(targetCount, stageName);
                 }
             }, 120);
         }
 
-        // ---------- Bracket pre-selection (square grid + strikethrough elimination) ----------
-        let preselectState = null; // { size, stageName, pool, out:Set, order:[], animating }
+        // ---------- Bracket selection inside the full participants grid ----------
+        let bracketSel = null; // { size, stageName, pool:[], out:Set, order:[], animating }
+        let gridMode = 'normal'; // 'normal' | 'select'
 
-        function openBracketPreselect(size, stageName) {
+        function openBracketSelection(size, stageName) {
             const pool = Array.from(participants);
-            preselectState = {
+            bracketSel = {
                 size,
                 stageName,
                 pool,
                 out: new Set(),
                 animating: false
             };
-
-            document.getElementById('bracket-select-modal').style.display = 'none';
-            document.getElementById('bracket-preselect-modal').style.display = 'flex';
-
-            document.getElementById('preselect-needed').innerText = String(size);
-            renderPreselectGrid();
-            resetPreselectButton();
+            gridMode = 'select';
+            openParticipantsGrid('select');
+            updateGridSelUI();
         }
 
-        function renderPreselectGrid() {
-            const st = preselectState;
-            if (!st) return;
-            const grid = document.getElementById('bracket-preselect-grid');
-            if (!grid) return;
-
-            // Square-ish grid: columns = ceil(sqrt(N))
-            const cols = Math.max(2, Math.min(16, Math.ceil(Math.sqrt(st.pool.length))));
-            grid.style.gridTemplateColumns = `repeat(${cols}, minmax(90px, 1fr))`;
-
-            let html = '';
-            st.pool.forEach((name, i) => {
-                const out = st.out.has(i);
-                const esc = String(name).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-                html += `<div class="preselect-cell${out ? ' out' : ''}" id="preselect-cell-${i}">
-                    <span class="strike"></span>
-                    <span class="preselect-idx">${i + 1}.</span>
-                    <span class="preselect-name">${esc}</span>
-                </div>`;
-            });
-            grid.innerHTML = html;
-            updatePreselectBadge();
+        function updateGridSelUI() {
+            const bs = bracketSel;
+            if (!bs) return;
+            const t = document.getElementById('grid-sel-total');
+            const n = document.getElementById('grid-sel-needed');
+            const badge = document.getElementById('grid-sel-badge');
+            if (t) t.innerText = String(bs.pool.length);
+            if (n) n.innerText = String(bs.size);
+            if (badge) badge.innerText = `${bs.pool.length - bs.out.size} / ${bs.size}`;
         }
 
-        function updatePreselectBadge() {
-            const st = preselectState;
-            if (!st) return;
-            const badge = document.getElementById('preselect-count-badge');
-            if (badge) badge.innerText = `${st.pool.length - st.out.size} / ${st.size}`;
-        }
+        function startGridElimination() {
+            const bs = bracketSel;
+            if (!bs) return;
+            const btn = document.getElementById('grid-sel-btn');
 
-        function resetPreselectButton() {
-            const btn = document.getElementById('preselect-start-btn');
-            if (!btn) return;
-            btn.innerText = 'НАЧАТЬ';
-            btn.disabled = false;
-            btn.classList.remove('pulse');
-            btn.classList.add('pulse');
-            btn.setAttribute('data-mode', 'start');
-        }
-
-        function setPreselectDone() {
-            const st = preselectState;
-            if (!st || st.out.size !== st.pool.length - st.size) return;
-            const btn = document.getElementById('preselect-start-btn');
-            if (!btn) return;
-            btn.innerText = 'ПРОДОЛЖИТЬ';
-            btn.disabled = false;
-            btn.classList.add('pulse');
-            btn.setAttribute('data-mode', 'done');
-        }
-
-        function startPreselectElimination() {
-            const st = preselectState;
-            if (!st) return;
-
-            // In "continue" (done) mode -> open the bracket
-            const btn = document.getElementById('preselect-start-btn');
-            if (btn && btn.getAttribute('data-mode') === 'done') {
-                confirmPreselect();
+            // In "continue" (done) mode -> build the bracket
+            if (btn && btn.dataset && btn.dataset.mode === 'done') {
+                finishBracketSelection();
                 return;
             }
 
-            // If already at the needed number, switch straight to "continue"
-            if (st.pool.length - st.out.size <= st.size) {
-                setPreselectDone();
+            // Already at the needed number -> switch straight to "continue"
+            if (bs.pool.length - bs.out.size <= bs.size) {
+                setGridSelDone();
                 return;
             }
 
-            // Compute how many must be eliminated
-            const outCount = st.pool.length - st.size;
-            // Available (not yet out) indices, shuffled
-            const avail = [];
-            for (let i = 0; i < st.pool.length; i++) {
-                if (!st.out.has(i)) avail.push(i);
-            }
-            // Shuffle
-            const shuffled = avail.slice().sort(() => Math.random() - 0.5);
-            const elim = shuffled.slice(0, outCount - st.out.size > 0 ? outCount - st.out.size : 0);
-            st.order = elim;
+            // How many more must be eliminated
+            const remainingElim = (bs.pool.length - bs.size) - bs.out.size;
+            const avail = bs.pool.filter(nm => !bs.out.has(nm)).slice().sort(() => Math.random() - 0.5);
+            const elim = avail.slice(0, remainingElim > 0 ? remainingElim : 0);
+            bs.order = elim;
 
             if (btn) {
                 btn.disabled = true;
@@ -2619,36 +2519,48 @@
             }
 
             // speed: shorter delay when many eliminations
-            const delay = Math.max(100, Math.min(450, Math.round(900 / Math.max(1, st.order.length))));
-            st.animating = true;
-            runNextElimination(st, delay, 0);
+            const delay = Math.max(80, Math.min(400, Math.round(700 / Math.max(1, bs.order.length))));
+            bs.animating = true;
+            runGridElimination(bs, delay, 0);
         }
 
-        function runNextElimination(st, delay, step) {
-            if (step >= st.order.length) {
-                st.animating = false;
-                setPreselectDone();
+        function runGridElimination(bs, delay, step) {
+            if (step >= bs.order.length) {
+                bs.animating = false;
+                setGridSelDone();
                 return;
             }
-            const idx = st.order[step];
-            st.out.add(idx);
-            const cell = document.getElementById('preselect-cell-' + idx);
-            if (cell) cell.classList.add('out');
-            updatePreselectBadge();
-            setTimeout(() => runNextElimination(st, delay, step + 1), delay);
+            const name = bs.order[step];
+            bs.out.add(name);
+            const cell = document.querySelector(`[data-pid="${encodeURIComponent(name)}"]`);
+            if (cell) cell.classList.add('outcard');
+            updateGridSelUI();
+            setTimeout(() => runGridElimination(bs, delay, step + 1), delay);
         }
 
-        function confirmPreselect() {
-            const st = preselectState;
-            if (!st) return;
-            if (st.out.size !== st.pool.length - st.size) return;
-            const survivors = st.pool.filter((_, i) => !st.out.has(i));
-            const size = st.size;
-            const stageName = st.stageName;
-            preselectState = null;
+        function setGridSelDone() {
+            const bs = bracketSel;
+            if (!bs || bs.out.size !== bs.pool.length - bs.size) return;
+            const btn = document.getElementById('grid-sel-btn');
+            if (btn) {
+                btn.innerText = 'ПРОДОЛЖИТЬ';
+                btn.disabled = false;
+                btn.classList.add('pulse');
+                btn.dataset.mode = 'done';
+            }
+            updateGridSelUI();
+        }
+
+        function finishBracketSelection() {
+            const bs = bracketSel;
+            if (!bs || bs.out.size !== bs.pool.length - bs.size) return;
+            const survivors = bs.pool.filter(nm => !bs.out.has(nm));
+            const size = bs.size;
+            const stageName = bs.stageName;
+            bracketSel = null;
+            gridMode = 'normal';
             initPlayoffBracket(size, stageName, survivors);
         }
-
         function initPlayoffBracket(size, stageName, poolOverride) {
             const allParticipants = Array.from(participants);
             // Shuffle participants for tournament seeding.
@@ -2898,14 +2810,26 @@
             }).catch(e => alert('Ошибка при копировании: ' + e));
         }
 
-        function openParticipantsGrid() {
+        function openParticipantsGrid(mode) {
             closeModals();
+            gridMode = (mode === 'select') ? 'select' : 'normal';
             renderParticipantsGrid();
+            const bar = document.getElementById('bracket-sel-bar');
+            const controls = document.getElementById('grid-controls');
+            if (bar) bar.style.display = (gridMode === 'select') ? 'flex' : 'none';
+            if (controls) controls.style.display = (gridMode === 'select') ? 'none' : 'flex';
+            const search = document.getElementById('grid-search-input');
+            if (search) search.value = '';
             document.getElementById('participants-grid-modal').style.display = 'flex';
-            const searchInput = document.getElementById('grid-search-input');
-            if (searchInput) {
-                searchInput.value = '';
-                searchInput.focus();
+            if (gridMode === 'select' && bracketSel) {
+                const btn = document.getElementById('grid-sel-btn');
+                if (btn) {
+                    btn.innerText = 'НАЧАТЬ';
+                    btn.disabled = false;
+                    btn.classList.add('pulse');
+                    btn.dataset.mode = 'start';
+                }
+                updateGridSelUI();
             }
         }
 
@@ -2936,19 +2860,23 @@
             }
 
             let html = '';
+            const isSelect = (gridMode === 'select' && bracketSel);
             filtered.forEach((u) => {
                 const hasWon = winners.has(u.toLowerCase());
                 const statusClass = hasWon ? 'won-status' : 'not-won-status';
                 const statusText = hasWon ? 'ВЫИГРЫВАЛ' : 'НЕ ВЫИГРЫВАЛ';
                 const origIndex = arr.indexOf(u) + 1;
                 const isPhantom = /^Фантом/i.test(u);
+                const isOut = isSelect && bracketSel.out.has(u);
+                const pid = encodeURIComponent(u);
 
-                html += `<div class="participant-grid-card ${hasWon ? 'is-winner' : ''}">
+                html += `<div class="participant-grid-card ${hasWon ? 'is-winner' : ''}${isOut ? ' outcard' : ''}" data-pid="${pid}">
+                    ${isSelect ? '<span class="strike-bar"></span>' : ''}
                     <span class="participant-grid-num">#${origIndex}</span>
                     <span class="participant-grid-name" title="${u}"><b>${u}</b> ${isPhantom ? '<span class="phantom-tag">ФАНТОМ</span>' : ''}</span>
                     <span class="participant-badge ${statusClass}" style="font-size: 9px; padding: 2px 7px;">${statusText}</span>
                     <label style="margin-left: auto; cursor: pointer; display: flex; align-items: center;">
-                        <input type="checkbox" checked onchange="toggleParticipantActive('${u.replace(/'/g, "\\'")}', this.checked)" title="Активировать / деактивировать">
+                        <input type="checkbox" checked ${isSelect ? 'disabled' : ''} onchange="toggleParticipantActive('${u.replace(/'/g, "\\'")}', this.checked)" title="Активировать / деактивировать">
                     </label>
                 </div>`;
             });
