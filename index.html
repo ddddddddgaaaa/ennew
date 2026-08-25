@@ -1291,7 +1291,6 @@
             <button class="btn-main btn-purple" onclick="openWheel()">РУЛЕТКА</button>
             <button class="btn-main btn-purple" onclick="instantRoll()">БЫСТРЫЙ РОЛЛ</button>
             <button class="btn-main btn-purple" onclick="rollForNonWinners()">РОЛ ДЛЯ НЕ ВЫИГРЫВАВШИХ</button>
-            <button class="btn-main btn-purple" onclick="openParticipantsGrid()">СЕТКА</button>
             <button class="btn-main btn-purple" onclick="openBracketSizeSelection()">СЕТКА</button>
             <button class="btn-main" onclick="openStats()">АНАЛИТИКА ПРОЕКТОВ</button>
             <button class="btn-main" onclick="openHistory()">ИСТОРИЯ ВЫПАДЕНИЙ</button>
@@ -1343,7 +1342,6 @@
                 <div class="red-participants">
                     <h4>СПИСОК УЧАСТНИКОВ <span id="user-count" style="font-size: 18px; color: var(--accent-neon-blue); font-weight: 800;">0</span></h4>
                     <div id="full-participants-list"></div>
-                    <button class="btn-main" style="margin: 10px 12px; width: calc(100% - 24px);" onclick="copyParticipants()">СКОПИРОВАТЬ УЧАСТНИКОВ</button>
                     <button class="btn-main" style="margin: 10px 12px 6px; width: calc(100% - 24px);" onclick="copyParticipants()">СКОПИРОВАТЬ УЧАСТНИКОВ</button>
                     <button class="btn-main btn-purple" style="margin: 0 12px 10px; width: calc(100% - 24px);" onclick="addPhantomParticipant()">+ ДОБАВИТЬ ФАНТОМНОГО УЧАСТНИКА</button>
                 </div>
@@ -1435,7 +1433,6 @@
             <div class="close-x" onclick="closeModals()">&times;</div>
             <div style="display: flex; justify-content: space-between; align-items: center; gap: 15px; margin-bottom: 18px; flex-wrap: wrap; padding-right: 40px;">
                 <div style="display: flex; align-items: center; gap: 12px;">
-                    <h2 style="color: var(--accent-neon-blue); margin: 0; text-shadow: none; font-size: 22px; letter-spacing: 1px;">СЕТКА УЧАСТНИКОВ</h2>
                     <h2 style="color: var(--accent-neon-blue); margin: 0; text-shadow: none; font-size: 22px; letter-spacing: 1px;">СПИСОК УЧАСТНИКОВ</h2>
                     <span id="grid-user-count-badge" class="participant-badge" style="font-size: 13px; padding: 4px 12px; border-radius: 8px;">0</span>
                 </div>
@@ -2051,7 +2048,6 @@
         }
 
         function syncParticipantsState() {
-            document.getElementById('user-count').innerText = participants.size;
             const countEl = document.getElementById('user-count');
             if (countEl) countEl.innerText = participants.size;
             updateFullParticipantsList();
@@ -2688,7 +2684,6 @@
 
                 html += `<div class="participant-grid-card ${hasWon ? 'is-winner' : ''}">
                     <span class="participant-grid-num">#${origIndex}</span>
-                    <span class="participant-grid-name" title="${u}"><b>${u}</b></span>
                     <span class="participant-grid-name" title="${u}"><b>${u}</b> ${isPhantom ? '<span class="phantom-tag">ФАНТОМ</span>' : ''}</span>
                     <span class="participant-badge ${statusClass}" style="font-size: 9px; padding: 2px 7px;">${statusText}</span>
                     <label style="margin-left: auto; cursor: pointer; display: flex; align-items: center;">
