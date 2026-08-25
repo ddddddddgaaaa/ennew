@@ -2980,6 +2980,12 @@ showEliminationBanner(null);
             const match = currentBracket.rounds[rIndex][mIndex];
             if (!match.p1 || !match.p2) return;
 
+            // Повторный клик по уже выбранному победителю — отменяем выбор
+            if (match.winner === player) {
+                clearMatchWinner(rIndex, mIndex);
+                return;
+            }
+
             // Animate the match card before updating
             const cardSel = document.querySelector(
                 `.playoff-match-card:nth-of-type(${mIndex + 1})`
@@ -3015,6 +3021,29 @@ showEliminationBanner(null);
             renderPlayoffBracket();
             // Small delay so animation plays before full re-render
             setTimeout(() => renderPlayoffBracket(), 120);
+        }
+
+        // Отменить выбор победителя в матче: убрать его из следующего раунда и ниже по сетке
+        function clearMatchWinner(rIndex, mIndex) {
+            if (!currentBracket) return;
+            const match = currentBracket.rounds[rIndex][mIndex];
+            if (!match || !match.winner) return;
+            const oldPlayer = match.winner;
+            match.winner = null;
+
+            const nextR = rIndex + 1;
+            if (nextR < currentBracket.rounds.length) {
+                const nextM = Math.floor(mIndex / 2);
+                const slot = (mIndex % 2 === 0) ? 'p1' : 'p2';
+                if (currentBracket.rounds[nextR][nextM][slot] === oldPlayer) {
+                    clearDownstreamWinner(nextR, nextM, oldPlayer);
+                    currentBracket.rounds[nextR][nextM][slot] = null;
+                }
+            } else if (currentBracket.champion === oldPlayer) {
+                currentBracket.champion = null;
+            }
+
+            renderPlayoffBracket();
         }
 
         function clearDownstreamWinner(rIndex, mIndex, oldPlayer) {
