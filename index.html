@@ -772,6 +772,37 @@
             gap: 10px;
             animation: champPulse 2s infinite ease-in-out;
         }
+        .bracket-two-sides {
+            display: flex;
+            align-items: stretch;
+            gap: 16px;
+            height: 100%;
+            width: 100%;
+        }
+        .bracket-half {
+            display: flex;
+            gap: 16px;
+            flex: 1 1 0;
+            min-width: 0;
+            align-items: center;
+            justify-content: center;
+        }
+        .bracket-half-left { order: 0; }
+        .bracket-half-right { order: 2; }
+        .bracket-center {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+            min-width: 250px;
+            flex-shrink: 0;
+            order: 1;
+        }
+        .bracket-center .playoff-round-col {
+            min-width: 230px;
+            max-width: 250px;
+        }
         .import-modal-content {
             width: min(1320px, 96vw);
             min-height: 520px;
@@ -1519,7 +1550,7 @@
 
     <!-- Modal: Playoff Tournament Bracket -->
     <div id="playoff-bracket-modal" class="modal">
-        <div class="modal-content" style="flex-direction: column; width: 96vw; max-width: 1440px; height: 90vh; padding: 25px; box-sizing: border-box;">
+        <div class="modal-content" style="flex-direction: column; width: 98vw; max-width: none; height: 97vh; padding: 22px; box-sizing: border-box;">
             <div class="close-x" onclick="closeModals()">&times;</div>
             
             <div style="display: flex; justify-content: space-between; align-items: center; gap: 15px; margin-bottom: 12px; flex-wrap: wrap; padding-right: 40px;">
@@ -2710,73 +2741,84 @@ showEliminationBanner(null);
             renderPlayoffBracket();
         }
 
+        function matchCardHTML(rIndex, mIndex) {
+            if (!currentBracket) return '';
+            const m = currentBracket.rounds[rIndex][mIndex];
+            if (!m) return '';
+            const hasBoth = m.p1 && m.p2;
+            const isP1Win = m.winner && m.winner === m.p1;
+            const isP2Win = m.winner && m.winner === m.p2;
+            const p1Phantom = m.p1 && /^Фантом/i.test(m.p1);
+            const p2Phantom = m.p2 && /^Фантом/i.test(m.p2);
+            const esc = (x) => x ? x.replace(/'/g, "\\'") : '';
+            const p1Display = m.p1 ? `<span class="playoff-slot-name"><b>${m.p1}</b> ${p1Phantom ? '<span class="phantom-tag">ФАНТОМ</span>' : ''}</span>` : '<span class="playoff-slot-name is-empty">-- Ожидание --</span>';
+            const p2Display = m.p2 ? `<span class="playoff-slot-name"><b>${m.p2}</b> ${p2Phantom ? '<span class="phantom-tag">ФАНТОМ</span>' : ''}</span>` : '<span class="playoff-slot-name is-empty">-- Ожидание --</span>';
+            let h = '<div class="playoff-match-card">';
+            h += '<div class="playoff-match-top"><span>МАТЧ #' + (mIndex + 1) + '</span>';
+            h += hasBoth && !m.winner ? `<button class="playoff-match-roll-btn" onclick="rollMatchWinner(${rIndex}, ${mIndex})" title="Быстрый ролл матча">🎲 РОЛЛ</button>` : '';
+            h += '</div>';
+            h += '<div class="playoff-slot ' + (isP1Win ? 'is-winner' : '') + ' ' + (!m.p1 ? 'is-empty' : '') + '" onclick="selectMatchWinner(' + rIndex + ', ' + mIndex + ', \'' + esc(m.p1) + '\')">' + p1Display + (isP1Win ? '<span style="color:#22c55e; font-weight:bold;">✓</span>' : '') + '</div>';
+            h += '<div class="playoff-slot ' + (isP2Win ? 'is-winner' : '') + ' ' + (!m.p2 ? 'is-empty' : '') + '" onclick="selectMatchWinner(' + rIndex + ', ' + mIndex + ', \'' + esc(m.p2) + '\')">' + p2Display + (isP2Win ? '<span style="color:#22c55e; font-weight:bold;">✓</span>' : '') + '</div>';
+            h += '</div>';
+            return h;
+        }
+
+        function roundColumnHTML(r, idxArr) {
+            const title = currentBracket.roundTitles[r] || ('Раунд ' + (r + 1));
+            let h = '<div class="playoff-round-col"><div class="playoff-round-header">' + title + '</div><div class="playoff-matches-list">';
+            idxArr.forEach(function (i) { h += matchCardHTML(r, i); });
+            h += '</div></div>';
+            return h;
+        }
+
+        function championCardHTML() {
+            let h = '<div class="playoff-matches-list" style="justify-content: center;">';
+            h += '<div class="playoff-champion-card">';
+            h += '<div style="font-size: 40px; margin-bottom: 4px;">👑</div>';
+            h += '<div style="font-size: 11px; color: #86efac; font-weight: 800; letter-spacing: 1px; text-transform: uppercase;">ЧЕМПИОН</div>';
+            h += '<div style="font-size: 18px; font-weight: 900; color: #ffffff; text-shadow: 0 0 10px rgba(34,197,94,0.8); word-break: break-word; text-align: center;">';
+            h += currentBracket.champion ? currentBracket.champion : '<span style="color: #64748b; font-weight: 400; font-size: 13px;">Ожидается финал</span>';
+            h += '</div>';
+            h += currentBracket.champion ? `<button class="btn-main btn-purple" style="margin-top:10px; width:100%; font-size:10px; padding:6px;" onclick="showWinnerRef('${currentBracket.champion.replace(/'/g, "\\'")}')">Карточка 📊</button>` : '';
+            h += '</div></div>';
+            return h;
+        }
+
         function renderPlayoffBracket() {
             const container = document.getElementById('playoff-bracket-container');
             if (!container || !currentBracket) return;
-
-            let html = '';
-
-            currentBracket.rounds.forEach((roundMatches, rIndex) => {
-                const title = currentBracket.roundTitles[rIndex] || `Раунд ${rIndex + 1}`;
-                html += `<div class="playoff-round-col">
-                    <div class="playoff-round-header">${title}</div>
-                    <div class="playoff-matches-list">`;
-
-                roundMatches.forEach((m, mIndex) => {
-                    const hasBoth = m.p1 && m.p2;
-                    const isP1Win = m.winner && m.winner === m.p1;
-                    const isP2Win = m.winner && m.winner === m.p2;
-
-                    const p1Phantom = m.p1 && /^Фантом/i.test(m.p1);
-                    const p2Phantom = m.p2 && /^Фантом/i.test(m.p2);
-
-                    const p1Display = m.p1 
-                        ? `<span class="playoff-slot-name"><b>${m.p1}</b> ${p1Phantom ? '<span class="phantom-tag">ФАНТОМ</span>' : ''}</span>`
-                        : `<span class="playoff-slot-name is-empty">-- Ожидание --</span>`;
-
-                    const p2Display = m.p2 
-                        ? `<span class="playoff-slot-name"><b>${m.p2}</b> ${p2Phantom ? '<span class="phantom-tag">ФАНТОМ</span>' : ''}</span>`
-                        : `<span class="playoff-slot-name is-empty">-- Ожидание --</span>`;
-
-                    html += `
-                    <div class="playoff-match-card">
-                        <div class="playoff-match-top">
-                            <span>МАТЧ #${mIndex + 1}</span>
-                            ${hasBoth && !m.winner ? `<button class="playoff-match-roll-btn" onclick="rollMatchWinner(${rIndex}, ${mIndex})" title="Быстрый ролл матча">🎲 РОЛЛ</button>` : ''}
-                        </div>
-                        <div class="playoff-slot ${isP1Win ? 'is-winner' : ''} ${!m.p1 ? 'is-empty' : ''}" onclick="selectMatchWinner(${rIndex}, ${mIndex}, '${m.p1 ? m.p1.replace(/'/g, "\\'") : ''}')">
-                            ${p1Display}
-                            ${isP1Win ? '<span style="color:#22c55e; font-weight:bold;">✓</span>' : ''}
-                        </div>
-                        <div class="playoff-slot ${isP2Win ? 'is-winner' : ''} ${!m.p2 ? 'is-empty' : ''}" onclick="selectMatchWinner(${rIndex}, ${mIndex}, '${m.p2 ? m.p2.replace(/'/g, "\\'") : ''}')">
-                            ${p2Display}
-                            ${isP2Win ? '<span style="color:#22c55e; font-weight:bold;">✓</span>' : ''}
-                        </div>
-                    </div>`;
-                });
-
-                html += `</div></div>`;
-            });
-
-            // Champion Column
-            html += `<div class="playoff-round-col" style="min-width: 210px;">
-                <div class="playoff-round-header" style="color: #22c55e; border-color: rgba(34, 197, 94, 0.4);">🏆 ПОБЕДИТЕЛЬ</div>
-                <div class="playoff-matches-list" style="justify-content: center;">
-                    <div class="playoff-champion-card">
-                        <div style="font-size: 40px; margin-bottom: 4px;">👑</div>
-                        <div style="font-size: 11px; color: #86efac; font-weight: 800; letter-spacing: 1px; text-transform: uppercase;">ЧЕМПИОН СЕТКИ</div>
-                        <div style="font-size: 18px; font-weight: 900; color: #ffffff; text-shadow: 0 0 10px rgba(34, 197, 94, 0.8); word-break: break-word; text-align: center;">
-                            ${currentBracket.champion ? currentBracket.champion : '<span style="color: #64748b; font-weight: 400; font-size: 13px;">Ожидается финал</span>'}
-                        </div>
-                        ${currentBracket.champion ? `<button class="btn-main btn-purple" style="margin-top: 10px; width: 100%; font-size: 10px; padding: 6px;" onclick="showWinnerRef('${currentBracket.champion.replace(/'/g, "\\'")}')">Карточка победителя 📊</button>` : ''}
-                    </div>
-                </div>
-            </div>`;
-
+            const rounds = currentBracket.rounds;
+            const finalR = rounds.length - 1;
+            let html = '<div class="bracket-two-sides">';
+            html += '<div class="bracket-half bracket-half-left">';
+            for (let r = 0; r < finalR; r++) {
+                const count = rounds[r].length;
+                const half = Math.floor(count / 2);
+                const idx = [];
+                for (let i = 0; i < half; i++) idx.push(i);
+                html += roundColumnHTML(r, idx);
+            }
+            html += '</div>';
+            html += '<div class="bracket-center">';
+            html += '<div class="playoff-round-col"><div class="playoff-round-header" style="color:#f59e0b; border-color:rgba(245,158,11,0.45);">🏆 ФИНАЛ</div><div class="playoff-matches-list" style="justify-content:center;">';
+            if (finalR >= 0) { for (let i = 0; i < rounds[finalR].length; i++) html += matchCardHTML(finalR, i); }
+            html += '</div></div>';
+            html += championCardHTML();
+            html += '</div>';
+            html += '<div class="bracket-half bracket-half-right">';
+            for (let r = finalR - 1; r >= 0; r--) {
+                const count = rounds[r].length;
+                const half = Math.floor(count / 2);
+                const idx = [];
+                for (let i = half; i < count; i++) idx.push(i);
+                html += roundColumnHTML(r, idx);
+            }
+            html += '</div>';
+            html += '</div>';
             container.innerHTML = html;
         }
 
-        function selectMatchWinner(rIndex, mIndex, player) {
+                function selectMatchWinner(rIndex, mIndex, player) {
             if (!player || !currentBracket) return;
             const match = currentBracket.rounds[rIndex][mIndex];
             if (!match.p1 || !match.p2) return;
