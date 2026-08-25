@@ -505,7 +505,8 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            padding: 10px 14px;
+            padding: 9px 15px;
+            gap: 10px;
             background: rgba(255, 255, 255, 0.03);
             border: 1px solid var(--accent-soft-border);
             border-radius: 12px;
@@ -522,10 +523,10 @@
             border-left: 3px solid var(--twitch-vip);
         }
         .participant-grid-num {
-            font-size: 11px;
+            font-size: 15px;
             color: #94a3b8;
             font-weight: 800;
-            min-width: 28px;
+            min-width: 36px;
         }
         .participant-grid-name {
             flex: 1;
@@ -533,7 +534,12 @@
             overflow: hidden;
             text-overflow: ellipsis;
             color: #f1f5f9;
-            font-size: 13px;
+            font-size: 18px;
+        }
+        .participant-grid-card input[type="checkbox"] {
+            width: 22px;
+            height: 22px;
+            cursor: pointer;
         }
         /* Bracket Selection & Playoff Grid */
         .bracket-size-grid {
@@ -584,38 +590,112 @@
         /* Bracket selection inside the full participants grid (strikethrough elimination) */
         .participant-grid-card {
             position: relative;
+            transition: border-color 0.3s ease, background 0.3s ease, opacity 0.3s ease;
         }
+
+        /* === GRID CARD ENTRANCE ANIMATION === */
+        @keyframes cardEnter {
+            from { opacity: 0; transform: translateY(8px) scale(0.96); }
+            to   { opacity: 1; transform: translateY(0)  scale(1); }
+        }
+        .participant-grid-card.card-enter {
+            animation: cardEnter 0.28s cubic-bezier(0.2, 0.8, 0.3, 1) both;
+        }
+
+        /* === ELIMINATION (outcard) === */
         .participant-grid-card.outcard {
-            opacity: 0.8;
             background: rgba(239, 68, 68, 0.1);
             border-color: rgba(239, 68, 68, 0.45);
+            opacity: 0.6;
         }
         .participant-grid-card.outcard .participant-grid-name,
         .participant-grid-card.outcard .participant-grid-num,
         .participant-grid-card.outcard .participant-badge,
         .participant-grid-card.outcard label {
-            opacity: 0.4;
+            opacity: 0.35;
         }
+
+        /* Flash-shake plays once when card first gets eliminated */
+        @keyframes elim-flash {
+            0%   { background: rgba(239, 68, 68, 0.55); box-shadow: 0 0 0 3px rgba(239,68,68,0.7), 0 0 30px rgba(239,68,68,0.6); transform: scale(1.04); }
+            15%  { transform: scale(0.97) translateX(-4px); }
+            30%  { transform: scale(1.02) translateX(4px); }
+            45%  { transform: scale(0.98) translateX(-2px); }
+            60%  { transform: scale(1.01) translateX(2px); }
+            80%  { transform: scale(1); background: rgba(239, 68, 68, 0.2); box-shadow: 0 0 16px rgba(239,68,68,0.35); }
+            100% { transform: scale(1); background: rgba(239, 68, 68, 0.1); box-shadow: none; }
+        }
+        .participant-grid-card.outcard-anim {
+            animation: elim-flash 0.65s cubic-bezier(0.3, 0.7, 0.4, 1) forwards;
+        }
+
+        /* Strike bar (red line across card) */
         .participant-grid-card .strike-bar {
             position: absolute;
             left: 0;
             top: 50%;
             height: 3px;
             width: 0%;
-            background: linear-gradient(90deg, #ef4444, #ff6b6b);
+            background: linear-gradient(90deg, #ef4444 0%, #ff6b6b 60%, #fca5a5 100%);
             transform: translateY(-50%);
             border-radius: 2px;
-            box-shadow: 0 0 10px rgba(239, 68, 68, 0.85);
+            box-shadow: 0 0 12px rgba(239, 68, 68, 0.9), 0 0 4px #fff;
             z-index: 2;
             pointer-events: none;
         }
         .participant-grid-card.outcard .strike-bar {
-            width: 100%;
-            animation: grid-strike 0.6s ease-out forwards;
+            animation: grid-strike 0.5s cubic-bezier(0.1, 0.9, 0.3, 1) 0.12s forwards;
         }
         @keyframes grid-strike {
-            from { width: 0%; }
-            to { width: 100%; }
+            from { width: 0%; opacity: 1; }
+            to   { width: 100%; opacity: 1; }
+        }
+
+        /* Ripple overlay on elimination */
+        .participant-grid-card .elim-ripple {
+            position: absolute;
+            inset: 0;
+            border-radius: 12px;
+            pointer-events: none;
+            z-index: 1;
+            opacity: 0;
+        }
+        @keyframes elim-ripple-anim {
+            0%   { box-shadow: 0 0 0 0 rgba(239,68,68,0.7); opacity: 1; }
+            100% { box-shadow: 0 0 0 18px rgba(239,68,68,0);  opacity: 0; }
+        }
+        .participant-grid-card.outcard-anim .elim-ripple {
+            animation: elim-ripple-anim 0.6s ease-out forwards;
+        }
+
+        /* === SURVIVOR (selected for bracket) === */
+        @keyframes survivor-glow {
+            0%   { box-shadow: 0 0 0 0  rgba(34,197,94,0); border-color: var(--accent-soft-border); }
+            30%  { box-shadow: 0 0 0 6px rgba(34,197,94,0.5), 0 0 24px rgba(34,197,94,0.4); border-color: #4ade80; transform: scale(1.03); }
+            70%  { box-shadow: 0 0 0 3px rgba(34,197,94,0.3), 0 0 14px rgba(34,197,94,0.25); border-color: #86efac; }
+            100% { box-shadow: 0 0 8px rgba(34,197,94,0.2); border-color: #4ade80; transform: scale(1); }
+        }
+        .participant-grid-card.survivor-reveal {
+            animation: survivor-glow 0.85s cubic-bezier(0.2, 0.9, 0.3, 1.1) both;
+            border-color: #4ade80 !important;
+            background: rgba(34, 197, 94, 0.07) !important;
+        }
+
+        /* Shimmer sweep across survivor card */
+        .participant-grid-card.survivor-reveal::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 12px;
+            background: linear-gradient(105deg, transparent 35%, rgba(74,222,128,0.25) 50%, transparent 65%);
+            background-size: 200% 100%;
+            animation: survivor-shimmer 0.9s ease-out 0.15s both;
+            pointer-events: none;
+            z-index: 1;
+        }
+        @keyframes survivor-shimmer {
+            from { background-position: -100% 0; opacity: 1; }
+            to   { background-position: 200%  0; opacity: 0; }
         }
         .btn-start-green {
             background: linear-gradient(135deg, #15803d, #22c55e);
@@ -683,10 +763,86 @@
             overflow: hidden;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
             transition: all 0.2s ease;
+            transition: box-shadow 0.25s ease, border-color 0.25s ease, transform 0.2s ease;
         }
         .playoff-match-card:hover {
             border-color: var(--accent-neon-blue);
+            box-shadow: 0 6px 22px rgba(56, 189, 248, 0.18);
+            transform: translateY(-1px);
         }
+
+        /* Bracket card entrance animation */
+        @keyframes bracketCardIn {
+            from { opacity: 0; transform: scale(0.88) translateY(10px); }
+            to   { opacity: 1; transform: scale(1)    translateY(0); }
+        }
+        .playoff-match-card.bracket-enter {
+            animation: bracketCardIn 0.35s cubic-bezier(0.2, 0.85, 0.3, 1.1) both;
+        }
+
+        /* Winner slot flash-in */
+        @keyframes winnerSlotIn {
+            0%   { background: rgba(34,197,94,0.55); box-shadow: inset 0 0 0 2px #4ade80, 0 0 20px rgba(34,197,94,0.7); }
+            60%  { background: rgba(34,197,94,0.3);  box-shadow: inset 0 0 0 1px #4ade80, 0 0 10px rgba(34,197,94,0.4); }
+            100% { background: rgba(34,197,94,0.22); box-shadow: none; }
+        }
+        .playoff-slot.is-winner {
+            background: rgba(34, 197, 94, 0.22) !important;
+            color: #86efac !important;
+            font-weight: 800;
+            animation: winnerSlotIn 0.5s ease-out both;
+        }
+
+        /* Loser slot dim + red highlight (выбывший) */
+        @keyframes loserSlotDim {
+            from { opacity: 1; }
+            to   { opacity: 0.75; }
+        }
+        .playoff-slot.is-loser {
+            animation: loserSlotDim 0.4s ease-out both;
+            opacity: 0.75;
+            background: rgba(239, 68, 68, 0.22) !important;
+            color: #fca5a5 !important;
+            border-left: 3px solid #ef4444;
+        }
+        .playoff-slot.is-loser .playoff-slot-name,
+        .playoff-slot.is-loser .playoff-slot-name b {
+            color: #fca5a5 !important;
+            text-decoration: line-through;
+            text-decoration-color: #ef4444;
+        }
+
+        /* Roll button spin on click */
+
+        @keyframes rollSpin {
+            0%   { transform: rotate(0deg) scale(1); }
+            40%  { transform: rotate(180deg) scale(1.3); }
+            100% { transform: rotate(360deg) scale(1); }
+        }
+        .playoff-match-roll-btn.rolling {
+            animation: rollSpin 0.55s cubic-bezier(0.3, 0.7, 0.4, 1) forwards;
+        }
+
+        /* Round header pulse on new match being filled */
+        @keyframes roundHeaderPop {
+            0%   { letter-spacing: 1px; color: #fff; }
+            50%  { letter-spacing: 3px; color: var(--accent-neon-blue); text-shadow: 0 0 14px rgba(56,189,248,0.7); }
+            100% { letter-spacing: 1px; color: var(--accent-neon-blue); }
+        }
+        .playoff-round-header.pop-anim {
+            animation: roundHeaderPop 0.6s ease-out both;
+        }
+
+        /* Match card "just won" full-card flash */
+        @keyframes matchWonFlash {
+            0%   { box-shadow: 0 0 0 3px rgba(34,197,94,0.9), 0 0 30px rgba(34,197,94,0.6); border-color: #4ade80; }
+            50%  { box-shadow: 0 0 0 1px rgba(34,197,94,0.5), 0 0 14px rgba(34,197,94,0.3); }
+            100% { box-shadow: 0 4px 15px rgba(0,0,0,0.3); border-color: var(--accent-soft-border); }
+        }
+        .playoff-match-card.match-won {
+            animation: matchWonFlash 0.7s ease-out both;
+        }
+
         .playoff-match-top {
             display: flex;
             justify-content: space-between;
@@ -749,7 +905,15 @@
             align-items: center;
             gap: 6px;
         }
-        
+        .phantom-tag {
+            font-size: 9px;
+            background: rgba(148, 163, 184, 0.15);
+            border: 1px solid rgba(148, 163, 184, 0.35);
+            color: #94a3b8;
+            padding: 1px 5px;
+            border-radius: 4px;
+            font-weight: 800;
+        }
         .playoff-champion-card {
             background: radial-gradient(circle at center, rgba(34, 197, 94, 0.18) 0%, rgba(15, 23, 42, 0.9) 100%);
             border: 2px solid #22c55e;
@@ -763,6 +927,36 @@
             justify-content: center;
             gap: 10px;
             animation: champPulse 2s infinite ease-in-out;
+            animation: champPulse 2.2s ease-in-out infinite;
+            position: relative;
+            overflow: hidden;
+        }
+        /* Shimmer sweep across champion card */
+        .playoff-champion-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(105deg, transparent 30%, rgba(74,222,128,0.18) 50%, transparent 70%);
+            background-size: 200% 100%;
+            animation: champShimmer 2.8s ease-in-out infinite;
+            pointer-events: none;
+        }
+        @keyframes champPulse {
+            0%, 100% { box-shadow: 0 0 18px rgba(34,197,94,0.3), 0 0 0 0 rgba(34,197,94,0.25); border-color: #22c55e; }
+            50%       { box-shadow: 0 0 40px rgba(34,197,94,0.6), 0 0 0 6px rgba(34,197,94,0.08); border-color: #4ade80; }
+        }
+        @keyframes champShimmer {
+            0%   { background-position: -100% 0; }
+            50%  { background-position: 200% 0; }
+            100% { background-position: 200% 0; }
+        }
+        @keyframes champReveal {
+            from { opacity: 0; transform: scale(0.7) rotate(-4deg); }
+            60%  { transform: scale(1.08) rotate(1deg); }
+            to   { opacity: 1; transform: scale(1) rotate(0deg); }
+        }
+        .playoff-champion-card.champion-revealed {
+            animation: champReveal 0.7s cubic-bezier(0.2, 0.9, 0.3, 1.2) both, champPulse 2.2s ease-in-out infinite 0.7s;
         }
         .bracket-two-sides {
             display: flex;
@@ -1480,6 +1674,7 @@
                     <h4>СПИСОК УЧАСТНИКОВ <span id="user-count" style="font-size: 18px; color: var(--accent-neon-blue); font-weight: 800;">0</span></h4>
                     <div id="full-participants-list"></div>
                     <button class="btn-main" style="margin: 10px 12px 6px; width: calc(100% - 24px);" onclick="copyParticipants()">СКОПИРОВАТЬ УЧАСТНИКОВ</button>
+                    <button class="btn-main btn-purple" style="margin: 0 12px 10px; width: calc(100% - 24px);" onclick="addPhantomParticipant()">+ ДОБАВИТЬ ФАНТОМНОГО УЧАСТНИКА</button>
                 </div>
                 <div class="orange-chat">
                     <h3>TWITCH CHAT VADYMS22</h3>
@@ -1506,6 +1701,11 @@
             </p>
 
             <div class="bracket-size-grid">
+                <div class="bracket-size-card" onclick="selectBracketSize(8, '1/4')">
+                    <div class="bracket-size-title">1/4</div>
+                    <div class="bracket-size-desc">1/4 ФИНАЛА</div>
+                    <div class="bracket-size-req">8 участников (4 матча)</div>
+                </div>
                 <div class="bracket-size-card" onclick="selectBracketSize(16, '1/8')">
                     <div class="bracket-size-title">1/8</div>
                     <div class="bracket-size-desc">1/8 ФИНАЛА</div>
@@ -1521,16 +1721,12 @@
                     <div class="bracket-size-desc">1/32 ФИНАЛА</div>
                     <div class="bracket-size-req">64 участника (32 матча)</div>
                 </div>
-                <div class="bracket-size-card" onclick="selectBracketSize(8, '1/4')">
-                    <div class="bracket-size-title">1/4</div>
-                    <div class="bracket-size-desc">1/4 ФИНАЛА</div>
-                    <div class="bracket-size-req">8 участников (4 матча)</div>
-                </div>
             </div>
 
             <div id="bracket-select-warning" style="display:none; color:#ef4444; background:rgba(239,68,68,0.14); border:1px solid #ef4444; border-radius:10px; padding:12px 16px; margin: 10px 0 16px 0; font-weight:700; text-align:center; font-size:13px;"></div>
 
             <div style="display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-top: 10px;">
+                <button class="btn-main btn-purple" style="width: auto; padding: 10px 18px; margin: 0; font-size: 11px;" onclick="addPhantomAndRefresh()">➕ ДОБАВИТЬ ФАНТОМНОГО УЧАСТНИКА</button>
                 <button class="btn-main" style="width: auto; padding: 10px 18px; margin: 0; font-size: 11px;" onclick="openParticipantsGrid()">👥 ВЕСЬ СПИСОК УЧАСТНИКОВ</button>
             </div>
         </div>
@@ -1547,6 +1743,7 @@
                     <span id="bracket-status-badge" class="participant-badge" style="font-size: 12px; padding: 4px 10px; border-radius: 8px;">16 УЧАСТНИКОВ</span>
                 </div>
                 <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                    <button class="btn-main btn-purple" style="margin:0; padding:8px 12px; width:auto; font-size:11px;" onclick="addPhantomInBracket()" title="Добавить фантома в общий список">➕ Фантом</button>
                     <button class="btn-main" style="margin:0; padding:8px 12px; width:auto; font-size:11px;" onclick="shuffleBracket()" title="Перемешать участников и начать заново">🎲 Перемешать</button>
                     <button class="btn-main" style="margin:0; padding:8px 12px; width:auto; font-size:11px;" onclick="autoRollCurrentRound()" title="Случайно выбрать победителей во всех текущих матчах">⚡ Авто-ролл раунда</button>
                     <button class="btn-main" style="margin:0; padding:8px 12px; width:auto; font-size:11px;" onclick="resetBracketResults()" title="Очистить результаты матчей">🔄 Сброс результатов</button>
@@ -1558,31 +1755,36 @@
             <div id="playoff-bracket-container" class="playoff-rounds-container">
                 <!-- Rounds dynamically rendered here -->
             </div>
+
+            <div style="display: flex; justify-content: center; width: 100%; padding-top: 16px;">
+                <button id="btn-continue-playoff" class="btn-start-green" style="width: 100%; max-width: 640px; padding: 18px 30px; font-size: 26px; font-weight: 900; letter-spacing: 2px; border-radius: 14px; text-transform: uppercase; border: none; cursor: pointer; box-shadow: 0 6px 22px rgba(34,197,94,0.35); margin: 0;" onclick="continuePlayoffRound()" title="Рандомно выбрать победителей текущего раунда и перейти дальше (1/4 → 1/8 → ... → финал)">✓ ПОДТВЕРДИТЬ</button>
+            </div>
         </div>
     </div>
 
     <!-- Modal: Full Participants Grid -->
     <div id="participants-grid-modal" class="modal">
-        <div class="modal-content" style="flex-direction: column; width: 97vw; max-width: none; height: 96vh; padding: 25px; box-sizing: border-box;">
+        <div class="modal-content" style="flex-direction: column; width: min(96vw, 1400px); max-width: none; height: auto; max-height: 86vh; padding: 20px; box-sizing: border-box;">
             <div class="close-x" onclick="closeModals()">&times;</div>
-            <div style="display: flex; justify-content: space-between; align-items: center; gap: 15px; margin-bottom: 18px; flex-wrap: wrap; padding-right: 40px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; gap: 15px; margin-bottom: 12px; flex-wrap: wrap; padding-right: 40px;">
                 <div style="display: flex; align-items: center; gap: 12px;">
-                    <h2 style="color: var(--accent-neon-blue); margin: 0; text-shadow: none; font-size: 22px; letter-spacing: 1px;">СПИСОК УЧАСТНИКОВ</h2>
-                    <span id="grid-user-count-badge" class="participant-badge" style="font-size: 13px; padding: 4px 12px; border-radius: 8px;">0</span>
+                    <h2 style="color: var(--accent-neon-blue); margin: 0; text-shadow: none; font-size: 30px; letter-spacing: 1px;">СПИСОК УЧАСТНИКОВ</h2>
+                    <span id="grid-user-count-badge" class="participant-badge" style="font-size: 19px; padding: 6px 18px; border-radius: 10px;">0</span>
                 </div>
-                <div id="grid-controls" style="display: flex; align-items: center; gap: 10px;">
-                    <input type="text" id="grid-search-input" placeholder="🔍 Поиск участника..." oninput="renderParticipantsGrid()" style="padding: 8px 14px; font-size: 13px; width: 220px; border-radius: 8px;">
-                    <button class="btn-main" style="margin: 0; padding: 8px 16px; width: auto; font-size: 11px; white-space: nowrap;" onclick="copyParticipants()">📋 Скопировать</button>
+                <div id="grid-controls" style="display: flex; align-items: center; gap: 14px;">
+                    <input type="text" id="grid-search-input" placeholder="🔍 Поиск участника..." oninput="renderParticipantsGrid()" style="padding: 12px 20px; font-size: 19px; width: 330px; border-radius: 10px;">
+                    <button class="btn-main btn-purple" style="margin: 0; padding: 12px 21px; width: auto; font-size: 16px; white-space: nowrap;" onclick="addPhantomParticipant()">➕ Фантом</button>
+                    <button class="btn-main" style="margin: 0; padding: 12px 24px; width: auto; font-size: 16px; white-space: nowrap;" onclick="copyParticipants()">📋 Скопировать</button>
                 </div>
             </div>
-            <div id="bracket-sel-bar" style="display: none; align-items: center; justify-content: space-between; gap: 14px; background: rgba(34, 197, 94, 0.08); border: 1px solid rgba(74, 222, 128, 0.4); border-radius: 12px; padding: 10px 16px; margin-bottom: 12px; flex-wrap: wrap;">
-                <div style="color: #e2e8f0; font-size: 13px;">
-                    Отобрать <b id="grid-sel-needed" style="color: var(--accent-neon-blue); font-size: 16px;">0</b> из <b id="grid-sel-total" style="color: var(--accent-neon-blue); font-size: 16px;">0</b>
-                    <span class="participant-badge" id="grid-sel-badge" style="margin-left: 12px; font-size: 12px; padding: 3px 10px; border-radius: 8px;">0 / 0</span>
+            <div id="bracket-sel-bar" style="display: none; align-items: center; justify-content: space-between; gap: 14px; background: rgba(34, 197, 94, 0.08); border: 1px solid rgba(74, 222, 128, 0.4); border-radius: 12px; padding: 15px 22px; margin-bottom: 16px; flex-wrap: wrap;">
+                <div style="color: #e2e8f0; font-size: 19px;">
+                    Отобрать <b id="grid-sel-needed" style="color: var(--accent-neon-blue); font-size: 24px;">0</b> из <b id="grid-sel-total" style="color: var(--accent-neon-blue); font-size: 24px;">0</b>
+                    <span class="participant-badge" id="grid-sel-badge" style="margin-left: 12px; font-size: 18px; padding: 4px 15px; border-radius: 10px;">0 / 0</span>
                 </div>
-                <button id="grid-sel-btn" class="btn-main btn-start-green pulse" style="margin: 0; padding: 10px 28px; font-size: 14px; font-weight: 800; letter-spacing: 1px;" onclick="startGridElimination()">НАЧАТЬ</button>
+                <button id="grid-sel-btn" class="btn-main btn-start-green pulse" style="margin: 0; padding: 15px 42px; font-size: 21px; font-weight: 800; letter-spacing: 1px;" onclick="startGridElimination()">НАЧАТЬ</button>
             </div>
-            <div id="grid-participants-container" style="flex: 1; overflow-y: auto; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; align-content: start; padding-right: 8px; padding-bottom: 8px;">
+            <div id="grid-participants-container" style="flex: 1; overflow-y: auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 12px; align-content: start; padding-right: 8px; padding-bottom: 8px;">
             </div>
         </div>
     </div>
@@ -2473,6 +2675,31 @@
 
         let currentBracket = null;
 
+        function addPhantomParticipant() {
+            const list = Array.from(participants);
+            let maxPhantomNum = 0;
+            list.forEach(p => {
+                const match = p.match(/^Фантом\s*(\d+)$/i);
+                if (match) {
+                    const num = parseInt(match[1], 10);
+                    if (!isNaN(num) && num > maxPhantomNum) maxPhantomNum = num;
+                }
+            });
+            const nextNum = maxPhantomNum + 1;
+            const phantomName = `Фантом ${nextNum}`;
+            addParticipantToFirebase(phantomName);
+            return phantomName;
+        }
+
+        function addPhantomAndRefresh() {
+            addPhantomParticipant();
+            setTimeout(updateBracketSelectUi, 50);
+        }
+
+        function addPhantomInBracket() {
+            addPhantomParticipant();
+        }
+
         function openBracketSizeSelection() {
             closeModals();
             updateBracketSelectUi();
@@ -2493,9 +2720,10 @@
             const currentCount = participants.size;
             const warnEl = document.getElementById('bracket-select-warning');
             if (currentCount < requiredCount) {
+                const diff = requiredCount - currentCount;
                 const msg = `Не достаточно участников! Для сетки ${stageName} требуется ${requiredCount} участников (сейчас в списке: ${currentCount}).`;
                 if (warnEl) {
-                    warnEl.innerHTML = msg;
+                    warnEl.innerHTML = `${msg}<br><button class="btn-main btn-purple" style="margin: 10px auto 0; width: auto; padding: 6px 16px; font-size: 11px;" onclick="fillMissingPhantoms(${requiredCount}, '${stageName}')">➕ Добавить недостающих ${diff} фантомов</button>`;
                     warnEl.style.display = 'block';
                 }
                 alert(msg);
@@ -2503,6 +2731,20 @@
             }
 
             openBracketSelection(requiredCount, stageName);
+        }
+
+        async function fillMissingPhantoms(targetCount, stageName) {
+            const needed = targetCount - participants.size;
+            if (needed <= 0) return;
+            for (let i = 0; i < needed; i++) {
+                addPhantomParticipant();
+            }
+            setTimeout(() => {
+                updateBracketSelectUi();
+                if (participants.size >= targetCount) {
+                    openBracketSelection(targetCount, stageName);
+                }
+            }, 120);
         }
 
         // ---------- Bracket selection inside the full participants grid ----------
@@ -2584,15 +2826,22 @@ function showEliminationBanner(name) {
         function runGridElimination(bs, delay, step) {
             if (step >= bs.order.length) {
                 bs.animating = false;
-showEliminationBanner(null);
+                showEliminationBanner(null);
                 setGridSelDone();
                 return;
             }
             const name = bs.order[step];
             bs.out.add(name);
-showEliminationBanner(name);
+            showEliminationBanner(name);
             const cell = document.querySelector(`[data-pid="${encodeURIComponent(name)}"]`);
-            if (cell) cell.classList.add('outcard');
+            if (cell) {
+                // Add flash-shake animation class
+                cell.classList.add('outcard-anim');
+                cell.addEventListener('animationend', () => {
+                    cell.classList.remove('outcard-anim');
+                    cell.classList.add('outcard');
+                }, { once: true });
+            }
             updateGridSelUI();
             setTimeout(() => runGridElimination(bs, delay, step + 1), delay);
         }
@@ -2608,6 +2857,18 @@ showEliminationBanner(name);
                 btn.dataset.mode = 'done';
             }
             updateGridSelUI();
+
+            // Animate survivor cards with staggered green glow
+            const survivors = bs.pool.filter(nm => !bs.out.has(nm));
+            survivors.forEach((nm, i) => {
+                const cell = document.querySelector(`[data-pid="${encodeURIComponent(nm)}"]`);
+                if (!cell) return;
+                setTimeout(() => {
+                    cell.classList.remove('survivor-reveal');
+                    void cell.offsetWidth; // restart animation
+                    cell.classList.add('survivor-reveal');
+                }, i * 80);
+            });
         }
 
         function finishBracketSelection() {
@@ -2694,15 +2955,19 @@ showEliminationBanner(null);
             const hasBoth = m.p1 && m.p2;
             const isP1Win = m.winner && m.winner === m.p1;
             const isP2Win = m.winner && m.winner === m.p2;
+            const isP1Lose = m.winner && m.winner !== m.p1 && m.p1;
+            const isP2Lose = m.winner && m.winner !== m.p2 && m.p2;
+            const p1Phantom = m.p1 && /^Фантом/i.test(m.p1);
+            const p2Phantom = m.p2 && /^Фантом/i.test(m.p2);
             const esc = (x) => x ? x.replace(/'/g, "\\'") : '';
-            const p1Display = m.p1 ? `<span class="playoff-slot-name"><b>${m.p1}</b></span>` : '<span class="playoff-slot-name is-empty">-- Ожидание --</span>';
-            const p2Display = m.p2 ? `<span class="playoff-slot-name"><b>${m.p2}</b></span>` : '<span class="playoff-slot-name is-empty">-- Ожидание --</span>';
+            const p1Display = m.p1 ? `<span class="playoff-slot-name"><b>${m.p1}</b> ${p1Phantom ? '<span class="phantom-tag">ФАНТОМ</span>' : ''}</span>` : '<span class="playoff-slot-name is-empty">-- Ожидание --</span>';
+            const p2Display = m.p2 ? `<span class="playoff-slot-name"><b>${m.p2}</b> ${p2Phantom ? '<span class="phantom-tag">ФАНТОМ</span>' : ''}</span>` : '<span class="playoff-slot-name is-empty">-- Ожидание --</span>';
             let h = '<div class="playoff-match-card">';
             h += '<div class="playoff-match-top"><span>МАТЧ #' + (mIndex + 1) + '</span>';
             h += hasBoth && !m.winner ? `<button class="playoff-match-roll-btn" onclick="rollMatchWinner(${rIndex}, ${mIndex})" title="Быстрый ролл матча">🎲 РОЛЛ</button>` : '';
             h += '</div>';
-            h += '<div class="playoff-slot ' + (isP1Win ? 'is-winner' : '') + ' ' + (!m.p1 ? 'is-empty' : '') + '" onclick="selectMatchWinner(' + rIndex + ', ' + mIndex + ', \'' + esc(m.p1) + '\')">' + p1Display + (isP1Win ? '<span style="color:#22c55e; font-weight:bold;">✓</span>' : '') + '</div>';
-            h += '<div class="playoff-slot ' + (isP2Win ? 'is-winner' : '') + ' ' + (!m.p2 ? 'is-empty' : '') + '" onclick="selectMatchWinner(' + rIndex + ', ' + mIndex + ', \'' + esc(m.p2) + '\')">' + p2Display + (isP2Win ? '<span style="color:#22c55e; font-weight:bold;">✓</span>' : '') + '</div>';
+            h += '<div class="playoff-slot ' + (isP1Win ? 'is-winner' : isP1Lose ? 'is-loser' : '') + ' ' + (!m.p1 ? 'is-empty' : '') + '" onclick="selectMatchWinner(' + rIndex + ', ' + mIndex + ', \'' + esc(m.p1) + '\')">' + p1Display + (isP1Win ? '<span style="color:#22c55e; font-weight:bold; margin-left:4px;">✓</span>' : '') + '</div>';
+            h += '<div class="playoff-slot ' + (isP2Win ? 'is-winner' : isP2Lose ? 'is-loser' : '') + ' ' + (!m.p2 ? 'is-empty' : '') + '" onclick="selectMatchWinner(' + rIndex + ', ' + mIndex + ', \'' + esc(m.p2) + '\')">' + p2Display + (isP2Win ? '<span style="color:#22c55e; font-weight:bold; margin-left:4px;">✓</span>' : '') + '</div>';
             h += '</div>';
             return h;
         }
@@ -2723,7 +2988,6 @@ showEliminationBanner(null);
             h += '<div style="font-size: 18px; font-weight: 900; color: #ffffff; text-shadow: 0 0 10px rgba(34,197,94,0.8); word-break: break-word; text-align: center;">';
             h += currentBracket.champion ? currentBracket.champion : '<span style="color: #64748b; font-weight: 400; font-size: 13px;">Ожидается финал</span>';
             h += '</div>';
-            h += currentBracket.champion ? `<button class="btn-main btn-purple" style="margin-top:10px; width:100%; font-size:10px; padding:6px;" onclick="showWinnerRef('${currentBracket.champion.replace(/'/g, "\\'")}')">Карточка 📊</button>` : '';
             h += '</div></div>';
             return h;
         }
@@ -2760,12 +3024,55 @@ showEliminationBanner(null);
             html += '</div>';
             html += '</div>';
             container.innerHTML = html;
+
+            // Отключаем кнопку "Продолжить", когда турнир доигран (есть чемпион)
+            // Staggered entrance animation for all match cards
+            const cards = container.querySelectorAll('.playoff-match-card');
+            cards.forEach((card, i) => {
+                card.style.animationDelay = `${i * 45}ms`;
+                card.classList.add('bracket-enter');
+                card.addEventListener('animationend', () => {
+                    card.classList.remove('bracket-enter');
+                    card.style.animationDelay = '';
+                }, { once: true });
+            });
+
+            // Add reveal animation to champion card if champion exists
+            if (currentBracket.champion) {
+                const champCard = container.querySelector('.playoff-champion-card');
+                if (champCard) {
+                    void champCard.offsetWidth;
+                    champCard.classList.add('champion-revealed');
+                }
+            }
+
+            // When tournament is done, the button opens the champion card
+            const btnCont = document.getElementById('btn-continue-playoff');
+            if (btnCont) {
+                const finished = currentBracket.champion != null;
+                btnCont.disabled = false;
+                btnCont.style.opacity = '1';
+                btnCont.style.cursor = 'pointer';
+                btnCont.title = finished ? 'Турнир завершён — открыть карточку победителя' : 'Рандомно выбрать победителей текущего раунда и перейти дальше';
+            }
         }
+
 
                 function selectMatchWinner(rIndex, mIndex, player) {
             if (!player || !currentBracket) return;
             const match = currentBracket.rounds[rIndex][mIndex];
             if (!match.p1 || !match.p2) return;
+
+            // Animate the match card before updating
+            const cardSel = document.querySelector(
+                `.playoff-match-card:nth-of-type(${mIndex + 1})`
+            );
+            // Try to find it via match context (all cards in the round column)
+            const allCards = document.querySelectorAll('.playoff-match-card');
+            // Flash all cards briefly to indicate selection, then re-render
+            if (allCards[mIndex]) {
+                allCards[mIndex].classList.add('match-won');
+            }
 
             // Set winner
             match.winner = player;
@@ -2789,6 +3096,8 @@ showEliminationBanner(null);
             }
 
             renderPlayoffBracket();
+            // Small delay so animation plays before full re-render
+            setTimeout(() => renderPlayoffBracket(), 120);
         }
 
         function clearDownstreamWinner(rIndex, mIndex, oldPlayer) {
@@ -2817,8 +3126,17 @@ showEliminationBanner(null);
             if (!currentBracket) return;
             const match = currentBracket.rounds[rIndex][mIndex];
             if (!match.p1 || !match.p2) return;
+
+            // Animate the roll button
+            const btn = event && event.target;
+            if (btn && btn.classList.contains('playoff-match-roll-btn')) {
+                btn.classList.add('rolling');
+                btn.disabled = true;
+            }
+
             const chosen = Math.random() < 0.5 ? match.p1 : match.p2;
             selectMatchWinner(rIndex, mIndex, chosen);
+            setTimeout(() => selectMatchWinner(rIndex, mIndex, chosen), 300);
         }
 
         function autoRollCurrentRound() {
@@ -2831,6 +3149,31 @@ showEliminationBanner(null);
                     }
                 });
             });
+        }
+
+        // "Продолжить": случайно выбирает победителя из каждой пары
+        // только в ПЕРВОМ незавершённым раунде и передаёт их дальше.
+        // Каждое нажатие продвигает сетку на один раунд (1/16 → 1/8 → ... → финал).
+        function continuePlayoffRound() {
+            if (!currentBracket) return;
+            const rounds = currentBracket.rounds;
+            for (let rIndex = 0; rIndex < rounds.length; rIndex++) {
+                const needsRoll = rounds[rIndex].some((m) => m.p1 && m.p2 && !m.winner);
+                if (!needsRoll) continue; // этот раунд уже полностью сыгран, идём дальше
+                rounds[rIndex].forEach((m, mIndex) => {
+                    if (m.p1 && m.p2 && !m.winner) {
+                        const chosen = Math.random() < 0.5 ? m.p1 : m.p2;
+                        selectMatchWinner(rIndex, mIndex, chosen);
+                    }
+                });
+                // Прокручиваем только один раунд за нажатие.
+                return;
+            }
+            // Все раунды сыграны — открываем карточку победителя.
+            renderPlayoffBracket();
+            if (currentBracket.champion) {
+                showWinnerRef(currentBracket.champion);
+            }
         }
 
         function shuffleBracket() {
@@ -2936,20 +3279,32 @@ showEliminationBanner(null);
                 const statusClass = hasWon ? 'won-status' : 'not-won-status';
                 const statusText = hasWon ? 'ВЫИГРЫВАЛ' : 'НЕ ВЫИГРЫВАЛ';
                 const origIndex = arr.indexOf(u) + 1;
+                const isPhantom = /^Фантом/i.test(u);
                 const isOut = isSelect && bracketSel.out.has(u);
                 const pid = encodeURIComponent(u);
 
                 html += `<div class="participant-grid-card ${hasWon ? 'is-winner' : ''}${isOut ? ' outcard' : ''}" data-pid="${pid}">
-                    ${isSelect ? '<span class="strike-bar"></span>' : ''}
+                    ${isSelect ? '<span class="strike-bar"></span><span class="elim-ripple"></span>' : ''}
                     <span class="participant-grid-num">#${origIndex}</span>
-                    <span class="participant-grid-name" title="${u}"><b>${u}</b></span>
-                    <span class="participant-badge ${statusClass}" style="font-size: 9px; padding: 2px 7px;">${statusText}</span>
+                    <span class="participant-grid-name" title="${u}"><b>${u}</b> ${isPhantom ? '<span class="phantom-tag">ФАНТОМ</span>' : ''}</span>
+                    <span class="participant-badge ${statusClass}" style="font-size: 13px; padding: 4px 11px;">${statusText}</span>
                     <label style="margin-left: auto; cursor: pointer; display: flex; align-items: center;">
                         <input type="checkbox" checked ${isSelect ? 'disabled' : ''} onchange="toggleParticipantActive('${u.replace(/'/g, "\\'")}', this.checked)" title="Активировать / деактивировать">
                     </label>
                 </div>`;
             });
             container.innerHTML = html;
+
+            // Staggered entrance animation for all cards
+            const cards = container.querySelectorAll('.participant-grid-card');
+            cards.forEach((card, i) => {
+                card.style.animationDelay = `${i * 28}ms`;
+                card.classList.add('card-enter');
+                card.addEventListener('animationend', () => {
+                    card.classList.remove('card-enter');
+                    card.style.animationDelay = '';
+                }, { once: true });
+            });
         }
         function toggleParticipantActive(name, active) {
             if (active) {
