@@ -535,6 +535,184 @@
             color: #f1f5f9;
             font-size: 13px;
         }
+        /* Bracket Selection & Playoff Grid */
+        .bracket-size-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 14px;
+            margin: 20px 0;
+            width: 100%;
+        }
+        .bracket-size-card {
+            background: rgba(255, 255, 255, 0.04);
+            border: 2px solid var(--accent-soft-border);
+            border-radius: 16px;
+            padding: 20px 14px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+        .bracket-size-card:hover {
+            background: var(--accent-hover-bg);
+            border-color: var(--accent-neon-blue);
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+        }
+        .bracket-size-title {
+            font-size: 26px;
+            font-weight: 900;
+            font-family: 'Orbitron', sans-serif;
+            color: var(--accent-neon-blue);
+            letter-spacing: 1px;
+        }
+        .bracket-size-desc {
+            font-size: 13px;
+            color: var(--soft-light);
+            font-weight: 700;
+        }
+        .bracket-size-req {
+            font-size: 11px;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+        
+        .playoff-rounds-container {
+            display: flex;
+            gap: 28px;
+            overflow-x: auto;
+            overflow-y: auto;
+            flex: 1;
+            padding: 15px 10px;
+            align-items: stretch;
+        }
+        .playoff-round-col {
+            display: flex;
+            flex-direction: column;
+            min-width: 230px;
+            max-width: 260px;
+            flex-shrink: 0;
+        }
+        .playoff-round-header {
+            text-align: center;
+            font-weight: 800;
+            font-size: 12px;
+            color: var(--accent-neon-blue);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 8px 12px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--accent-soft-border);
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+        .playoff-matches-list {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            flex: 1;
+            gap: 14px;
+        }
+        .playoff-match-card {
+            background: rgba(15, 23, 42, 0.9);
+            border: 1px solid var(--accent-soft-border);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            transition: all 0.2s ease;
+        }
+        .playoff-match-card:hover {
+            border-color: var(--accent-neon-blue);
+        }
+        .playoff-match-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 4px 8px;
+            background: rgba(255, 255, 255, 0.02);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            font-size: 10px;
+            color: #94a3b8;
+            font-weight: 700;
+        }
+        .playoff-match-roll-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 11px;
+            padding: 2px 5px;
+            border-radius: 4px;
+            color: var(--accent-neon-blue);
+            transition: 0.2s;
+        }
+        .playoff-match-roll-btn:hover {
+            background: var(--accent-hover-bg);
+            transform: scale(1.15);
+        }
+        .playoff-slot {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 9px 10px;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 12.5px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+            color: #cbd5e1;
+        }
+        .playoff-slot:last-child {
+            border-bottom: none;
+        }
+        .playoff-slot:hover:not(.is-empty) {
+            background: var(--accent-hover-bg);
+            color: #ffffff;
+        }
+        .playoff-slot.is-winner {
+            background: rgba(34, 197, 94, 0.22) !important;
+            color: #86efac !important;
+            font-weight: 800;
+        }
+        .playoff-slot.is-empty {
+            cursor: default;
+            color: #64748b;
+            font-style: italic;
+        }
+        .playoff-slot-name {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .phantom-tag {
+            font-size: 9px;
+            background: rgba(148, 163, 184, 0.15);
+            border: 1px solid rgba(148, 163, 184, 0.35);
+            color: #94a3b8;
+            padding: 1px 5px;
+            border-radius: 4px;
+            font-weight: 800;
+        }
+        .playoff-champion-card {
+            background: radial-gradient(circle at center, rgba(34, 197, 94, 0.18) 0%, rgba(15, 23, 42, 0.9) 100%);
+            border: 2px solid #22c55e;
+            border-radius: 16px;
+            padding: 24px 16px;
+            text-align: center;
+            box-shadow: 0 0 25px rgba(34, 197, 94, 0.3);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            animation: champPulse 2s infinite ease-in-out;
+        }
         .import-modal-content {
             width: min(1320px, 96vw);
             min-height: 520px;
@@ -1114,6 +1292,7 @@
             <button class="btn-main btn-purple" onclick="instantRoll()">БЫСТРЫЙ РОЛЛ</button>
             <button class="btn-main btn-purple" onclick="rollForNonWinners()">РОЛ ДЛЯ НЕ ВЫИГРЫВАВШИХ</button>
             <button class="btn-main btn-purple" onclick="openParticipantsGrid()">СЕТКА</button>
+            <button class="btn-main btn-purple" onclick="openBracketSizeSelection()">СЕТКА</button>
             <button class="btn-main" onclick="openStats()">АНАЛИТИКА ПРОЕКТОВ</button>
             <button class="btn-main" onclick="openHistory()">ИСТОРИЯ ВЫПАДЕНИЙ</button>
             <div style="margin-top: auto;">
@@ -1165,6 +1344,8 @@
                     <h4>СПИСОК УЧАСТНИКОВ <span id="user-count" style="font-size: 18px; color: var(--accent-neon-blue); font-weight: 800;">0</span></h4>
                     <div id="full-participants-list"></div>
                     <button class="btn-main" style="margin: 10px 12px; width: calc(100% - 24px);" onclick="copyParticipants()">СКОПИРОВАТЬ УЧАСТНИКОВ</button>
+                    <button class="btn-main" style="margin: 10px 12px 6px; width: calc(100% - 24px);" onclick="copyParticipants()">СКОПИРОВАТЬ УЧАСТНИКОВ</button>
+                    <button class="btn-main btn-purple" style="margin: 0 12px 10px; width: calc(100% - 24px);" onclick="addPhantomParticipant()">+ ДОБАВИТЬ ФАНТОМНОГО УЧАСТНИКА</button>
                 </div>
                 <div class="orange-chat">
                     <h3>TWITCH CHAT VADYMS22</h3>
@@ -1180,16 +1361,87 @@
             <div onclick="openAdminLogin()" style="position:absolute; bottom:2px; left:50%; transform:translateX(-50%); width:160px; height:22px; cursor:default; z-index:10000; background:transparent; border:none; outline:none;"></div>
         </div>
     </div>
+    
+    <!-- Modal: Bracket Size Selection -->
+    <div id="bracket-select-modal" class="modal">
+        <div class="modal-content" style="flex-direction: column; width: 90vw; max-width: 820px; padding: 30px; box-sizing: border-box;">
+            <div class="close-x" onclick="closeModals()">&times;</div>
+            <h2 style="color: var(--accent-neon-blue); margin: 0 0 6px 0; text-shadow: none; font-size: 24px; text-align: center;">ВЫБОР СЕТКИ ПЛЕЙ-ОФФ</h2>
+            <p style="color: #94a3b8; font-size: 14px; text-align: center; margin: 0 0 16px 0;">
+                Выберите формат турнирной сетки. Сейчас в списке: <span id="bracket-current-count" style="font-weight: 800; color: var(--accent-neon-blue); font-size: 16px;">0</span> участников
+            </p>
+
+            <div class="bracket-size-grid">
+                <div class="bracket-size-card" onclick="selectBracketSize(16, '1/8')">
+                    <div class="bracket-size-title">1/8</div>
+                    <div class="bracket-size-desc">1/8 ФИНАЛА</div>
+                    <div class="bracket-size-req">16 участников (8 матчей)</div>
+                </div>
+                <div class="bracket-size-card" onclick="selectBracketSize(32, '1/16')">
+                    <div class="bracket-size-title">1/16</div>
+                    <div class="bracket-size-desc">1/16 ФИНАЛА</div>
+                    <div class="bracket-size-req">32 участника (16 матчей)</div>
+                </div>
+                <div class="bracket-size-card" onclick="selectBracketSize(64, '1/32')">
+                    <div class="bracket-size-title">1/32</div>
+                    <div class="bracket-size-desc">1/32 ФИНАЛА</div>
+                    <div class="bracket-size-req">64 участника (32 матча)</div>
+                </div>
+                <div class="bracket-size-card" onclick="selectBracketSize(8, '1/4')">
+                    <div class="bracket-size-title">1/4</div>
+                    <div class="bracket-size-desc">1/4 ФИНАЛА</div>
+                    <div class="bracket-size-req">8 участников (4 матча)</div>
+                </div>
+            </div>
+
+            <div id="bracket-select-warning" style="display:none; color:#ef4444; background:rgba(239,68,68,0.14); border:1px solid #ef4444; border-radius:10px; padding:12px 16px; margin: 10px 0 16px 0; font-weight:700; text-align:center; font-size:13px;"></div>
+
+            <div style="display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-top: 10px;">
+                <button class="btn-main btn-purple" style="width: auto; padding: 10px 18px; margin: 0; font-size: 11px;" onclick="addPhantomAndRefresh()">➕ ДОБАВИТЬ ФАНТОМНОГО УЧАСТНИКА</button>
+                <button class="btn-main" style="width: auto; padding: 10px 18px; margin: 0; font-size: 11px;" onclick="openParticipantsGrid()">👥 ВЕСЬ СПИСОК УЧАСТНИКОВ</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Playoff Tournament Bracket -->
+    <div id="playoff-bracket-modal" class="modal">
+        <div class="modal-content" style="flex-direction: column; width: 96vw; max-width: 1440px; height: 90vh; padding: 25px; box-sizing: border-box;">
+            <div class="close-x" onclick="closeModals()">&times;</div>
+            
+            <div style="display: flex; justify-content: space-between; align-items: center; gap: 15px; margin-bottom: 12px; flex-wrap: wrap; padding-right: 40px;">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <h2 id="bracket-modal-title" style="color: var(--accent-neon-blue); margin: 0; text-shadow: none; font-size: 20px; letter-spacing: 1px;">СЕТКА ПЛЕЙ-ОФФ</h2>
+                    <span id="bracket-status-badge" class="participant-badge" style="font-size: 12px; padding: 4px 10px; border-radius: 8px;">16 УЧАСТНИКОВ</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                    <button class="btn-main btn-purple" style="margin:0; padding:8px 12px; width:auto; font-size:11px;" onclick="addPhantomInBracket()" title="Добавить фантома в общий список">➕ Фантом</button>
+                    <button class="btn-main" style="margin:0; padding:8px 12px; width:auto; font-size:11px;" onclick="shuffleBracket()" title="Перемешать участников и начать заново">🎲 Перемешать</button>
+                    <button class="btn-main" style="margin:0; padding:8px 12px; width:auto; font-size:11px;" onclick="autoRollCurrentRound()" title="Случайно выбрать победителей во всех текущих матчах">⚡ Авто-ролл раунда</button>
+                    <button class="btn-main" style="margin:0; padding:8px 12px; width:auto; font-size:11px;" onclick="resetBracketResults()" title="Очистить результаты матчей">🔄 Сброс результатов</button>
+                    <button class="btn-main" style="margin:0; padding:8px 12px; width:auto; font-size:11px;" onclick="openBracketSizeSelection()" title="Выбрать другой формат сетки">⚙️ Формат</button>
+                    <button class="btn-main" style="margin:0; padding:8px 12px; width:auto; font-size:11px;" onclick="copyBracketText()" title="Скопировать пары в буфер обмена">📋 Скопировать</button>
+                </div>
+            </div>
+
+            <div id="playoff-bracket-container" class="playoff-rounds-container">
+                <!-- Rounds dynamically rendered here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Full Participants Grid -->
     <div id="participants-grid-modal" class="modal">
         <div class="modal-content" style="flex-direction: column; width: 92vw; max-width: 1200px; height: 85vh; padding: 25px; box-sizing: border-box;">
             <div class="close-x" onclick="closeModals()">&times;</div>
             <div style="display: flex; justify-content: space-between; align-items: center; gap: 15px; margin-bottom: 18px; flex-wrap: wrap; padding-right: 40px;">
                 <div style="display: flex; align-items: center; gap: 12px;">
                     <h2 style="color: var(--accent-neon-blue); margin: 0; text-shadow: none; font-size: 22px; letter-spacing: 1px;">СЕТКА УЧАСТНИКОВ</h2>
+                    <h2 style="color: var(--accent-neon-blue); margin: 0; text-shadow: none; font-size: 22px; letter-spacing: 1px;">СПИСОК УЧАСТНИКОВ</h2>
                     <span id="grid-user-count-badge" class="participant-badge" style="font-size: 13px; padding: 4px 12px; border-radius: 8px;">0</span>
                 </div>
                 <div style="display: flex; align-items: center; gap: 10px;">
                     <input type="text" id="grid-search-input" placeholder="🔍 Поиск участника..." oninput="renderParticipantsGrid()" style="padding: 8px 14px; font-size: 13px; width: 220px; border-radius: 8px;">
+                    <button class="btn-main btn-purple" style="margin: 0; padding: 8px 14px; width: auto; font-size: 11px; white-space: nowrap;" onclick="addPhantomParticipant()">➕ Фантом</button>
                     <button class="btn-main" style="margin: 0; padding: 8px 16px; width: auto; font-size: 11px; white-space: nowrap;" onclick="copyParticipants()">📋 Скопировать</button>
                 </div>
             </div>
@@ -1800,7 +2052,10 @@
 
         function syncParticipantsState() {
             document.getElementById('user-count').innerText = participants.size;
+            const countEl = document.getElementById('user-count');
+            if (countEl) countEl.innerText = participants.size;
             updateFullParticipantsList();
+            updateBracketSelectUi();
             // Не обновляем wheelParticipants если рулетка сейчас крутится
             if (!isWheelSpinning) {
                 wheelParticipants = getActiveParticipants();
@@ -2070,7 +2325,324 @@
             renderParticipantsGrid();
         }
 
+        let currentBracket = null;
+
+        function addPhantomParticipant() {
+            const list = Array.from(participants);
+            let maxPhantomNum = 0;
+            list.forEach(p => {
+                const match = p.match(/^Фантом\s*(\d+)$/i);
+                if (match) {
+                    const num = parseInt(match[1], 10);
+                    if (!isNaN(num) && num > maxPhantomNum) maxPhantomNum = num;
+                }
+            });
+            const nextNum = maxPhantomNum + 1;
+            const phantomName = `Фантом ${nextNum}`;
+            addParticipantToFirebase(phantomName);
+            return phantomName;
+        }
+
+        function addPhantomAndRefresh() {
+            addPhantomParticipant();
+            setTimeout(updateBracketSelectUi, 50);
+        }
+
+        function addPhantomInBracket() {
+            addPhantomParticipant();
+        }
+
+        function openBracketSizeSelection() {
+            closeModals();
+            updateBracketSelectUi();
+            document.getElementById('bracket-select-modal').style.display = 'flex';
+        }
+
+        function updateBracketSelectUi() {
+            const countEl = document.getElementById('bracket-current-count');
+            if (countEl) countEl.innerText = participants.size;
+            const warnEl = document.getElementById('bracket-select-warning');
+            if (warnEl) {
+                warnEl.innerText = '';
+                warnEl.style.display = 'none';
+            }
+        }
+
+        function selectBracketSize(requiredCount, stageName) {
+            const currentCount = participants.size;
+            const warnEl = document.getElementById('bracket-select-warning');
+            if (currentCount < requiredCount) {
+                const diff = requiredCount - currentCount;
+                const msg = `Не достаточно участников! Для сетки ${stageName} требуется ${requiredCount} участников (сейчас в списке: ${currentCount}).`;
+                if (warnEl) {
+                    warnEl.innerHTML = `${msg}<br><button class="btn-main btn-purple" style="margin: 10px auto 0; width: auto; padding: 6px 16px; font-size: 11px;" onclick="fillMissingPhantoms(${requiredCount}, '${stageName}')">➕ Добавить недостающих ${diff} фантомов</button>`;
+                    warnEl.style.display = 'block';
+                }
+                alert(msg);
+                return;
+            }
+
+            initPlayoffBracket(requiredCount, stageName);
+        }
+
+        async function fillMissingPhantoms(targetCount, stageName) {
+            const needed = targetCount - participants.size;
+            if (needed <= 0) return;
+            for (let i = 0; i < needed; i++) {
+                addPhantomParticipant();
+            }
+            setTimeout(() => {
+                updateBracketSelectUi();
+                if (participants.size >= targetCount) {
+                    initPlayoffBracket(targetCount, stageName);
+                }
+            }, 120);
+        }
+
+        function initPlayoffBracket(size, stageName) {
+            const allParticipants = Array.from(participants);
+            // Shuffle participants for tournament seeding
+            const pool = [...allParticipants].sort(() => Math.random() - 0.5).slice(0, size);
+
+            const roundTitles = [];
+            let tempSize = size;
+            while (tempSize > 1) {
+                if (tempSize === 64) roundTitles.push('1/32 финала');
+                else if (tempSize === 32) roundTitles.push('1/16 финала');
+                else if (tempSize === 16) roundTitles.push('1/8 финала');
+                else if (tempSize === 8) roundTitles.push('1/4 финала');
+                else if (tempSize === 4) roundTitles.push('Полуфинал (1/2)');
+                else if (tempSize === 2) roundTitles.push('Финал');
+                tempSize /= 2;
+            }
+
+            const rounds = [];
+            // Round 0
+            const round0 = [];
+            for (let i = 0; i < size / 2; i++) {
+                round0.push({
+                    p1: pool[i * 2] || null,
+                    p2: pool[i * 2 + 1] || null,
+                    winner: null
+                });
+            }
+            rounds.push(round0);
+
+            // Subsequent rounds
+            let matchCount = size / 4;
+            while (matchCount >= 1) {
+                const nextRound = [];
+                for (let i = 0; i < matchCount; i++) {
+                    nextRound.push({
+                        p1: null,
+                        p2: null,
+                        winner: null
+                    });
+                }
+                rounds.push(nextRound);
+                matchCount /= 2;
+            }
+
+            currentBracket = {
+                size,
+                stageName,
+                roundTitles,
+                rounds,
+                champion: null
+            };
+
+            closeModals();
+            document.getElementById('bracket-modal-title').innerText = `СЕТКА ПЛЕЙ-ОФФ ${stageName}`;
+            document.getElementById('bracket-status-badge').innerText = `${size} УЧАСТНИКОВ`;
+            document.getElementById('playoff-bracket-modal').style.display = 'flex';
+            renderPlayoffBracket();
+        }
+
+        function renderPlayoffBracket() {
+            const container = document.getElementById('playoff-bracket-container');
+            if (!container || !currentBracket) return;
+
+            let html = '';
+
+            currentBracket.rounds.forEach((roundMatches, rIndex) => {
+                const title = currentBracket.roundTitles[rIndex] || `Раунд ${rIndex + 1}`;
+                html += `<div class="playoff-round-col">
+                    <div class="playoff-round-header">${title}</div>
+                    <div class="playoff-matches-list">`;
+
+                roundMatches.forEach((m, mIndex) => {
+                    const hasBoth = m.p1 && m.p2;
+                    const isP1Win = m.winner && m.winner === m.p1;
+                    const isP2Win = m.winner && m.winner === m.p2;
+
+                    const p1Phantom = m.p1 && /^Фантом/i.test(m.p1);
+                    const p2Phantom = m.p2 && /^Фантом/i.test(m.p2);
+
+                    const p1Display = m.p1 
+                        ? `<span class="playoff-slot-name"><b>${m.p1}</b> ${p1Phantom ? '<span class="phantom-tag">ФАНТОМ</span>' : ''}</span>`
+                        : `<span class="playoff-slot-name is-empty">-- Ожидание --</span>`;
+
+                    const p2Display = m.p2 
+                        ? `<span class="playoff-slot-name"><b>${m.p2}</b> ${p2Phantom ? '<span class="phantom-tag">ФАНТОМ</span>' : ''}</span>`
+                        : `<span class="playoff-slot-name is-empty">-- Ожидание --</span>`;
+
+                    html += `
+                    <div class="playoff-match-card">
+                        <div class="playoff-match-top">
+                            <span>МАТЧ #${mIndex + 1}</span>
+                            ${hasBoth && !m.winner ? `<button class="playoff-match-roll-btn" onclick="rollMatchWinner(${rIndex}, ${mIndex})" title="Быстрый ролл матча">🎲 РОЛЛ</button>` : ''}
+                        </div>
+                        <div class="playoff-slot ${isP1Win ? 'is-winner' : ''} ${!m.p1 ? 'is-empty' : ''}" onclick="selectMatchWinner(${rIndex}, ${mIndex}, '${m.p1 ? m.p1.replace(/'/g, "\\'") : ''}')">
+                            ${p1Display}
+                            ${isP1Win ? '<span style="color:#22c55e; font-weight:bold;">✓</span>' : ''}
+                        </div>
+                        <div class="playoff-slot ${isP2Win ? 'is-winner' : ''} ${!m.p2 ? 'is-empty' : ''}" onclick="selectMatchWinner(${rIndex}, ${mIndex}, '${m.p2 ? m.p2.replace(/'/g, "\\'") : ''}')">
+                            ${p2Display}
+                            ${isP2Win ? '<span style="color:#22c55e; font-weight:bold;">✓</span>' : ''}
+                        </div>
+                    </div>`;
+                });
+
+                html += `</div></div>`;
+            });
+
+            // Champion Column
+            html += `<div class="playoff-round-col" style="min-width: 210px;">
+                <div class="playoff-round-header" style="color: #22c55e; border-color: rgba(34, 197, 94, 0.4);">🏆 ПОБЕДИТЕЛЬ</div>
+                <div class="playoff-matches-list" style="justify-content: center;">
+                    <div class="playoff-champion-card">
+                        <div style="font-size: 40px; margin-bottom: 4px;">👑</div>
+                        <div style="font-size: 11px; color: #86efac; font-weight: 800; letter-spacing: 1px; text-transform: uppercase;">ЧЕМПИОН СЕТКИ</div>
+                        <div style="font-size: 18px; font-weight: 900; color: #ffffff; text-shadow: 0 0 10px rgba(34, 197, 94, 0.8); word-break: break-word; text-align: center;">
+                            ${currentBracket.champion ? currentBracket.champion : '<span style="color: #64748b; font-weight: 400; font-size: 13px;">Ожидается финал</span>'}
+                        </div>
+                        ${currentBracket.champion ? `<button class="btn-main btn-purple" style="margin-top: 10px; width: 100%; font-size: 10px; padding: 6px;" onclick="showWinnerRef('${currentBracket.champion.replace(/'/g, "\\'")}')">Карточка победителя 📊</button>` : ''}
+                    </div>
+                </div>
+            </div>`;
+
+            container.innerHTML = html;
+        }
+
+        function selectMatchWinner(rIndex, mIndex, player) {
+            if (!player || !currentBracket) return;
+            const match = currentBracket.rounds[rIndex][mIndex];
+            if (!match.p1 || !match.p2) return;
+
+            // Set winner
+            match.winner = player;
+
+            // Advance to next round
+            const nextR = rIndex + 1;
+            if (nextR < currentBracket.rounds.length) {
+                const nextM = Math.floor(mIndex / 2);
+                const slot = (mIndex % 2 === 0) ? 'p1' : 'p2';
+                
+                // If previous winner changed, clear downstream
+                const oldWinnerInSlot = currentBracket.rounds[nextR][nextM][slot];
+                if (oldWinnerInSlot && oldWinnerInSlot !== player) {
+                    clearDownstreamWinner(nextR, nextM, oldWinnerInSlot);
+                }
+                
+                currentBracket.rounds[nextR][nextM][slot] = player;
+            } else {
+                // Final match won!
+                currentBracket.champion = player;
+            }
+
+            renderPlayoffBracket();
+        }
+
+        function clearDownstreamWinner(rIndex, mIndex, oldPlayer) {
+            if (rIndex >= currentBracket.rounds.length) {
+                if (currentBracket.champion === oldPlayer) currentBracket.champion = null;
+                return;
+            }
+            const match = currentBracket.rounds[rIndex][mIndex];
+            if (match.winner === oldPlayer) {
+                match.winner = null;
+                const nextR = rIndex + 1;
+                if (nextR < currentBracket.rounds.length) {
+                    const nextM = Math.floor(mIndex / 2);
+                    const slot = (mIndex % 2 === 0) ? 'p1' : 'p2';
+                    if (currentBracket.rounds[nextR][nextM][slot] === oldPlayer) {
+                        currentBracket.rounds[nextR][nextM][slot] = null;
+                        clearDownstreamWinner(nextR, nextM, oldPlayer);
+                    }
+                } else if (currentBracket.champion === oldPlayer) {
+                    currentBracket.champion = null;
+                }
+            }
+        }
+
+        function rollMatchWinner(rIndex, mIndex) {
+            if (!currentBracket) return;
+            const match = currentBracket.rounds[rIndex][mIndex];
+            if (!match.p1 || !match.p2) return;
+            const chosen = Math.random() < 0.5 ? match.p1 : match.p2;
+            selectMatchWinner(rIndex, mIndex, chosen);
+        }
+
+        function autoRollCurrentRound() {
+            if (!currentBracket) return;
+            currentBracket.rounds.forEach((roundMatches, rIndex) => {
+                roundMatches.forEach((m, mIndex) => {
+                    if (m.p1 && m.p2 && !m.winner) {
+                        const chosen = Math.random() < 0.5 ? m.p1 : m.p2;
+                        selectMatchWinner(rIndex, mIndex, chosen);
+                    }
+                });
+            });
+        }
+
+        function shuffleBracket() {
+            if (!currentBracket) return;
+            if (confirm('Перемешать участников и начать сетку заново?')) {
+                initPlayoffBracket(currentBracket.size, currentBracket.stageName);
+            }
+        }
+
+        function resetBracketResults() {
+            if (!currentBracket) return;
+            if (confirm('Сбросить результаты всех матчей в сетке?')) {
+                currentBracket.rounds.forEach((roundMatches, rIndex) => {
+                    roundMatches.forEach((m) => {
+                        m.winner = null;
+                        if (rIndex > 0) {
+                            m.p1 = null;
+                            m.p2 = null;
+                        }
+                    });
+                });
+                currentBracket.champion = null;
+                renderPlayoffBracket();
+            }
+        }
+
+        function copyBracketText() {
+            if (!currentBracket) return;
+            let text = `🏆 СЕТКА ПЛЕЙ-ОФФ ${currentBracket.stageName} (${currentBracket.size} участников)\n`;
+            text += `----------------------------------------\n`;
+            currentBracket.rounds.forEach((roundMatches, rIndex) => {
+                const title = currentBracket.roundTitles[rIndex] || `Раунд ${rIndex + 1}`;
+                text += `\n[ ${title} ]\n`;
+                roundMatches.forEach((m, mIndex) => {
+                    const p1 = m.p1 || '???';
+                    const p2 = m.p2 || '???';
+                    const w = m.winner ? ` (Победитель: ${m.winner})` : '';
+                    text += `  Матч ${mIndex + 1}: ${p1} vs ${p2}${w}\n`;
+                });
+            });
+            if (currentBracket.champion) {
+                text += `\n👑 ЧЕМПИОН: ${currentBracket.champion}\n`;
+            }
+            navigator.clipboard.writeText(text).then(() => {
+                alert('Сетка турнира скопирована в буфер обмена!');
+            }).catch(e => alert('Ошибка при копировании: ' + e));
+        }
+
         function openParticipantsGrid() {
+            closeModals();
             renderParticipantsGrid();
             document.getElementById('participants-grid-modal').style.display = 'flex';
             const searchInput = document.getElementById('grid-search-input');
@@ -2112,10 +2684,12 @@
                 const statusClass = hasWon ? 'won-status' : 'not-won-status';
                 const statusText = hasWon ? 'ВЫИГРЫВАЛ' : 'НЕ ВЫИГРЫВАЛ';
                 const origIndex = arr.indexOf(u) + 1;
+                const isPhantom = /^Фантом/i.test(u);
 
                 html += `<div class="participant-grid-card ${hasWon ? 'is-winner' : ''}">
                     <span class="participant-grid-num">#${origIndex}</span>
                     <span class="participant-grid-name" title="${u}"><b>${u}</b></span>
+                    <span class="participant-grid-name" title="${u}"><b>${u}</b> ${isPhantom ? '<span class="phantom-tag">ФАНТОМ</span>' : ''}</span>
                     <span class="participant-badge ${statusClass}" style="font-size: 9px; padding: 2px 7px;">${statusText}</span>
                     <label style="margin-left: auto; cursor: pointer; display: flex; align-items: center;">
                         <input type="checkbox" checked onchange="toggleParticipantActive('${u.replace(/'/g, "\\'")}', this.checked)" title="Активировать / деактивировать">
