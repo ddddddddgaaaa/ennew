@@ -1099,6 +1099,63 @@
             box-shadow: inset 0 0 18px rgba(0,0,0,0.28);
             animation: textGlow 2s ease-in-out infinite;
         }
+        /* Elimination "ВЫБЫЛ" banner (one-by-one) */
+        .elim-banner {
+            position: fixed;
+            inset: 0;
+            z-index: 100000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            background: rgba(2, 2, 5, 0.72);
+            backdrop-filter: blur(7px);
+            pointer-events: none;
+        }
+        .elim-banner.show {
+            display: flex;
+        }
+        .elim-banner-inner {
+            text-align: center;
+            padding: 46px 80px;
+            border-radius: 26px;
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.22), rgba(2, 2, 5, 0.3));
+            border: 3px solid #ef4444;
+            box-shadow: 0 0 70px rgba(239, 68, 68, 0.55), inset 0 0 40px rgba(239, 68, 68, 0.12);
+            animation: elimBannerIn 0.35s cubic-bezier(0.2, 0.9, 0.3, 1.2), elimBannerPulse 1.4s ease-in-out infinite 0.35s;
+            max-width: 92vw;
+        }
+        .elim-banner-small {
+            color: #fca5a5;
+            font-size: 14px;
+            font-weight: 800;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+        .elim-banner-name {
+            color: #ffffff;
+            font-size: 46px;
+            font-weight: 900;
+            line-height: 1.1;
+            text-shadow: 0 0 30px rgba(239, 68, 68, 0.9), 0 0 60px rgba(239, 68, 68, 0.5);
+            word-break: break-word;
+        }
+        .elim-banner-close {
+            margin-top: 16px;
+            font-size: 12px;
+            letter-spacing: 2px;
+            color: #9ca3af;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+        @keyframes elimBannerIn {
+            from { opacity: 0; transform: scale(0.6); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        @keyframes elimBannerPulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 70px rgba(239, 68, 68, 0.55), inset 0 0 40px rgba(239, 68, 68, 0.12); }
+            50% { transform: scale(1.04); box-shadow: 0 0 100px rgba(239, 68, 68, 0.8), inset 0 0 55px rgba(239, 68, 68, 0.2); }
+        }
         @media (max-width: 980px) {
             .import-layout {
                 grid-template-columns: 1fr;
@@ -1488,7 +1545,7 @@
 
     <!-- Modal: Full Participants Grid -->
     <div id="participants-grid-modal" class="modal">
-        <div class="modal-content" style="flex-direction: column; width: 92vw; max-width: 1200px; height: 85vh; padding: 25px; box-sizing: border-box;">
+        <div class="modal-content" style="flex-direction: column; width: 97vw; max-width: none; height: 96vh; padding: 25px; box-sizing: border-box;">
             <div class="close-x" onclick="closeModals()">&times;</div>
             <div style="display: flex; justify-content: space-between; align-items: center; gap: 15px; margin-bottom: 18px; flex-wrap: wrap; padding-right: 40px;">
                 <div style="display: flex; align-items: center; gap: 12px;">
@@ -1508,10 +1565,20 @@
                 </div>
                 <button id="grid-sel-btn" class="btn-main btn-start-green pulse" style="margin: 0; padding: 10px 28px; font-size: 14px; font-weight: 800; letter-spacing: 1px;" onclick="startGridElimination()">НАЧАТЬ</button>
             </div>
-            <div id="grid-participants-container" style="flex: 1; overflow-y: auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 10px; align-content: start; padding-right: 6px;">
+            <div id="grid-participants-container" style="flex: 1; overflow-y: auto; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; align-content: start; padding-right: 8px; padding-bottom: 8px;">
             </div>
         </div>
     </div>
+
+    <!-- Elimination "ВЫБЫЛ" banner -->
+    <div id="elimBanner" class="elim-banner">
+        <div class="elim-banner-inner">
+            <div class="elim-banner-small">ВЫБЫЛ ИЗ СЕТКИ</div>
+            <div class="elim-banner-name" id="elimBannerName">---</div>
+            <div class="elim-banner-close">зачёркнут в сетке ниже</div>
+        </div>
+    </div>
+
     <div id="history-modal" class="modal"><div class="modal-content" style="flex-direction: column; min-width: 950px; height: 80vh;"><div class="close-x" onclick="closeModals()">&times;</div><h2 style="color: var(--accent-neon-blue); margin: 0; text-shadow: none;">Полная история выпадений</h2><div style="width: 100%; overflow-y: auto; margin-top: 20px;"><table class="stats-table" style="width: 100%; border-collapse: collapse;"><thead><tr><th style="padding: 12px;">Дата</th><th style="padding: 12px;">Никнейм</th><th style="padding: 12px;">Telegram</th><th style="padding: 12px;">Проект</th><th style="padding: 12px;">Выводы (₽)</th><th style="padding: 12px;">Депы (₽)</th><th style="padding: 12px;">Рероллы</th><th style="padding: 12px;">Действие</th></tr></thead><tbody id="history-body"></tbody></table></div></div></div>
     <div id="stats-modal" class="modal"><div class="modal-content" style="flex-direction: column; min-width: 750px; max-height: 80vh;"><div class="close-x" onclick="closeModals()">&times;</div><h2 style="color: var(--accent-neon-blue); margin: 0; text-shadow: none;">Статистика по сайтам</h2><div style="width: 100%; overflow-y: auto; margin-top: 20px;"><table class="stats-table" style="width: 100%; border-collapse: collapse;"><thead><tr><th>Проект / Сайт</th><th>Побед</th><th>Общ. Выводы (₽)</th><th>Общ. Депозиты (₽)</th><th>Действие</th></tr></thead><tbody id="stats-body"></tbody></table></div></div></div>
             <div id="wheel-modal" class="modal"><div class="modal-content"><div class="close-x" onclick="closeModals()">&times;</div><div class="wheel-container"><div class="wheel-arrow-container"><div class="wheel-arrow-pointer"></div><div id="wheel-nick-display" class="wheel-nick-display">---</div></div><canvas id="wheelCanvas" width="700" height="700"></canvas></div><div class="wheel-controls" style="width: 340px; display: flex; flex-direction: column; gap: 12px; margin-left: 20px;"><h3 style="margin: 0; text-align: center; color: var(--accent-neon-blue);">Настройки</h3><div id="elim-log" style="text-align: center; color: var(--accent-neon-blue); font-weight: bold; min-height: 20px; font-size: 14px;"></div><button class="btn-main" onclick="openImportParticipants()">ВСТАВИТЬ СПИСОК УЧАСТНИКОВ</button><button class="btn-main" style="background: rgba(239, 68, 68, 0.12); border-color: #ef4444; color: #ef4444;" onclick="resetWheelParticipants()">🗑️ СБРОСИТЬ УЧАСТНИКОВ</button><div style="display:flex; gap:8px;"><button id="mode-elim" class="btn-main btn-purple btn-spin-mode" onclick="setSpinMode('elimination')">НА ВЫБЫВАНИЕ</button><button id="mode-normal" class="btn-main btn-purple btn-spin-mode" onclick="setSpinMode('normal')">ОБЫЧНЫЙ ВЫБОР</button></div><div style="text-align: center; margin: 10px 0;"><label style="font-size: 13px; color: #888;">Время (сек):</label>
@@ -2519,19 +2586,34 @@
             }
 
             // speed: shorter delay when many eliminations
-            const delay = Math.max(80, Math.min(400, Math.round(700 / Math.max(1, bs.order.length))));
+            const delay = Math.max(350, Math.min(650, Math.round(2400 / Math.max(1, bs.order.length))));
             bs.animating = true;
             runGridElimination(bs, delay, 0);
         }
 
+function showEliminationBanner(name) {
+            const banner = document.getElementById('elimBanner');
+            const nameEl = document.getElementById('elimBannerName');
+            if (!banner || !nameEl) return;
+            if (!name) {
+                banner.classList.remove('show');
+                return;
+            }
+            nameEl.innerText = name;
+            banner.classList.remove('show');
+            void banner.offsetWidth; // перезапуск анимации
+            banner.classList.add('show');
+        }
         function runGridElimination(bs, delay, step) {
             if (step >= bs.order.length) {
                 bs.animating = false;
+showEliminationBanner(null);
                 setGridSelDone();
                 return;
             }
             const name = bs.order[step];
             bs.out.add(name);
+showEliminationBanner(name);
             const cell = document.querySelector(`[data-pid="${encodeURIComponent(name)}"]`);
             if (cell) cell.classList.add('outcard');
             updateGridSelUI();
@@ -2559,6 +2641,7 @@
             const stageName = bs.stageName;
             bracketSel = null;
             gridMode = 'normal';
+showEliminationBanner(null);
             initPlayoffBracket(size, stageName, survivors);
         }
         function initPlayoffBracket(size, stageName, poolOverride) {
@@ -2813,6 +2896,7 @@
         function openParticipantsGrid(mode) {
             closeModals();
             gridMode = (mode === 'select') ? 'select' : 'normal';
+            showEliminationBanner(null);
             renderParticipantsGrid();
             const bar = document.getElementById('bracket-sel-bar');
             const controls = document.getElementById('grid-controls');
